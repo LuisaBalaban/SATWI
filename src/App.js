@@ -32,6 +32,7 @@ class App extends React.Component {
     this.dropPro=this.dropPro.bind(this);
     this.loginBrand=this.loginBrand.bind(this);
     this.userSearch=this.userSearch.bind(this);
+    this.goPro=this.goPro.bind(this);
   }
   userSearch()
   {
@@ -69,6 +70,10 @@ class App extends React.Component {
     
       this.scrollEnd.scrollIntoView({ behavior: "smooth" });
 
+  }
+  goPro()
+  {
+    this.props.history.push({ pathname: '/board-config'})
   }
   render() {
 
@@ -149,7 +154,7 @@ class App extends React.Component {
           <div id="ProDropDown" class="dropdown-content">
           <section>
           <p> Do you want your brand to be on top of your customers reviews? Register now and closely analyze your Twitter trends</p>
-          <button className="btn-user">Register now</button>
+          <button onClick={this.goPro} className="btn-user">Register now</button>
           </section></div></div>
           
       </div>
