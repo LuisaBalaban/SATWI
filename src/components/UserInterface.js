@@ -141,8 +141,7 @@ class UserInterface extends React.Component {
        console.log(this.state.polarity_assoc) 
        console.log(this.state.max_followers)
        console.log(this.state.no_hashtags)
-       console.log(this.state.word_sentiment_positive)
-       console.log([this.state.word_sentiment_positive[1]][0][0])
+    
 
           Object.keys(this.state.labeledTweets).map((key, index) => (
           key=this.state.labeledTweets[key]))

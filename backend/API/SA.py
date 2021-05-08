@@ -47,7 +47,7 @@ def loadModel(preprocessedSearchedTweets):
   resultsDETAILED.append(round(tf_predictions[i][0].numpy().tolist(),4))
   labeledTweets[preprocessedSearchedTweets[i]]=labels[label[i]];
   labeledTweetsDETAILED[preprocessedSearchedTweets[i]]=resultsDETAILED[i]
- print(labeledTweetsDETAILED);
+#  print(labeledTweetsDETAILED);
  for tweet in labeledTweetsDETAILED:
    tweet=preprocess._processTweet(tweet)
    polarity=0
@@ -55,9 +55,9 @@ def loadModel(preprocessedSearchedTweets):
    words=[w for w in words if w not in stop_words] 
 #    print(words)
    for word in words:
-    # print(word)
+    #print(word)
     for word_frq in APIcall.rt_paired_freq.keys():
-    #   print(word_frq)
+      #print(word_frq)
       if word==word_frq:
          #print(labeledTweetsDETAILED[tweet])
          polarity=labeledTweetsDETAILED[tweet]
@@ -112,7 +112,7 @@ def loadModel(preprocessedSearchedTweets):
            "word_sentiment_positive":word_sentiment_positive,
            "word_sentiment_negative":word_sentiment_negative}
  print(jsonData)
- return jsonify(jsonData)
+ return jsonData
 
 # def polarityToJson(polarityValues):
 #   out=polarityValues.to_json(orient='records')

@@ -813,3 +813,8 @@ button:focus {
   margin-left: 40px;
   margin-right: 100px;
 }
+.wrapper
+{
+  display:flex;
+  overflow: hidden;
+}
