@@ -79,8 +79,8 @@ def creatingTestSet(searched_keyword):
    total_no_rtweets=0
    hashtags_pairing_id={}
    for tweet_info in tweepy.Cursor(api.search, q=searched_keyword,rpp=50, lang="en", tweet_mode='extended', type='popular').items(50):
-    #  print('****************TWEET  INFO*****************')
-    #  print(tweet_info)
+     print('****************TWEET  INFO*****************')
+     print(tweet_info)
      if 'retweeted_status' in dir(tweet_info):
                tweet=tweet_info.retweeted_status.full_text
                retweets.append(tweet)

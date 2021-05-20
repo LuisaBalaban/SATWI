@@ -121,4 +121,3 @@ def loadModel(preprocessedSearchedTweets):
 #    f.write(out)
 #    f.truncate()
 #   return 
-

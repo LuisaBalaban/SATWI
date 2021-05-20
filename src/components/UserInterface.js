@@ -40,7 +40,7 @@ class UserInterface extends React.Component {
             total_no_rtweets:0,
             no_hashtags:0,
             all_followers:0,
-            loaded:1,
+            loaded:0,
             word_sentiment_negative:[[0,0],[0,0],[0,0],[0,0],[0,0]],
             word_sentiment_positive:[[0,0],[0,0],[0,0],[0,0],[0,0]],
             search_query:''

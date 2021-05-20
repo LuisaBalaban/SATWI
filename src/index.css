@@ -22,7 +22,7 @@
   justify-content: center;
   text-align: left;
   font-size: 50px;
-  color: #635f66;
+  color: #645c68;
   margin-left: 20px;
 
 }
@@ -35,7 +35,7 @@
   justify-content: center;
   text-align: left;
   font-size: 30px;
-  color: #3c3a3d;
+  color: #645c68;
   margin-left: 20px;
 }
 p{
@@ -82,7 +82,7 @@ p{
   
 }
 #btn-start{
-  color:#635f66;
+  color:#645c68;
 }
 #btn-find-out, #btn-start{
   font-family: 'Roboto Condensed', sans-serif;
@@ -144,7 +144,7 @@ p{
   justify-content: center;
   text-align: left;
   font-size: 50px;
-  color: #635f66;
+  color: #645c68;
   margin-left: 20px;
  
 }
@@ -215,6 +215,7 @@ p{
   text-align:  center;
   width:  300px;
   margin-top: 35px;
+  margin-bottom: 40px;
   padding:  0px!important;
   font-size: 30px;
   color:  #fff;
@@ -311,7 +312,7 @@ form
     height: 96px;
 }
 
-input[type="text"]
+input[type="text"],input[type="date"]
 {
     width: 100%;
     height: 96px;
@@ -459,7 +460,7 @@ li {
 
 /* Element counter */
 li::before {
-  content: counters(index, ".", decimal-leading-zero);
+  /* content: counters(index, ".", decimal-leading-zero); */
   font-size: 1.5rem;
   text-align: right;
   font-weight: bold;
@@ -486,9 +487,11 @@ li + li {
 }
 /* login  */
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100,500);
+
 .box {
 margin-left: 40px;
 margin-right: 30px;
+margin-top: 70px;
 background: #FFFFFF;
 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 border-radius: 14px;
@@ -525,7 +528,7 @@ a{
 .child {
   margin-top: 40px;
   margin-bottom: 40px;
-  display: block;
+  display: inline;
   margin-left: 40px;
   margin-right: 40px;
   height: 200px;
@@ -535,9 +538,9 @@ a{
 
 }
 .vertical h3{
-  font-family: 'Inconsolata', monospace;
+  font-family: 'Reem Kufi', monospace;
+  font-size: 30px;
 
-  font-size: 20px;
 }
 .child p{
   margin: 0;
@@ -806,6 +809,7 @@ button:focus {
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 14px;
   margin-top: 20px;
+  margin-bottom: 20px;
   display: -webkit-box
 }
 .form-board
@@ -815,6 +819,175 @@ button:focus {
 }
 .wrapper
 {
-  display:flex;
+  display:inline;
   overflow: hidden;
+}
+.chart{
+  margin-left: 290px;
+}
+.chart h4{
+  font-size: 50px;
+  margin-inline:auto;
+  margin-top: 0px;
+}
+#feature
+{
+  font-family: monospace;
+  font-size: 20px;
+  font-style:italic;
+  color: #645c68;
+  list-style-type: disc;       
+  list-style-position: inside;
+  display: list-item; 
+}
+#info{
+  font-size: 15px;
+  margin-bottom: 5px;
+  margin-inline: 0;
+  font-family: Reem Kufi;
+  width:100%;
+}
+#add-proj{
+  width: 100%;
+  height: 100px;
+  text-align: left;
+  background: #FFFFFF;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  font-size: 50px;
+}
+#hidden-project-norm, #hidden-project-norm2, #hidden-project-norm3
+{
+display:none;
+margin-top: 30px;
+padding-block: 20px;
+padding-inline: 20px;
+background: #FFFFFF;
+box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+border-radius: 14px;
+}
+
+/* 
+.containerCheckBoxes {
+  max-width: 100%;
+  font-family: monospace, sans-serif;
+  font-size: 15px;
+}
+
+ul.ks-cboxtags li{
+display: inline;
+
+}
+ul.ks-cboxtags li label{
+display:inline-flex;
+  background-color: rgba(255, 255, 255, .9);
+  border: 2px solid rgba(139, 139, 139, .3);
+  color: #adadad;
+  border-radius: 25px;
+  margin: 3px 0px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: all .2s;
+}
+
+ul.ks-cboxtags li label {
+  padding: 8px 12px;
+  cursor: pointer;
+  height:40px;
+  margin-inline: 10px;
+  width:70px;
+}
+
+
+ul.ks-cboxtags li input[type="checkbox"]:checked + label::before {
+
+  transform: rotate(-360deg);
+  transition: transform .3s ease-in-out;
+}
+
+ul.ks-cboxtags li input[type="checkbox"]:checked + label {
+  border: 2px solid #857494;
+  background-color: #b19ac7;
+  color: #fff;
+  transition: all .2s;
+}
+
+ul.ks-cboxtags li input[type="checkbox"] {
+display: absolute;
+}
+ul.ks-cboxtags li input[type="checkbox"] {
+position: absolute;
+opacity: 0;
+}
+ul.ks-cboxtags li input[type="checkbox"]:focus + label {
+border: 2px solid #e9a1ff;
+} */
+
+#inline-btns {
+display: inline;
+
+}
+
+input[type=checkbox]{
+	height: 0;
+	width: 0;
+	visibility: hidden;
+}
+
+label {
+	cursor: pointer;
+
+	text-indent: -9999px;
+	width: 80px;
+	height: 40px;
+	background: grey;
+	display: block;
+	border-radius: 100px;
+	position: relative;
+}
+
+label:after {
+	content: '';
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	width: 30px;
+	height: 30px;
+	background: #fff;
+	border-radius: 90px;
+	transition: 0.3s;
+}
+
+input:checked + label {
+	background: #855bac;
+}
+
+input:checked + label:after {
+	left: calc(100% - 5px);
+	transform: translateX(-100%);
+}
+
+label:active:after {
+	width: 80px;
+}
+
+#trigger-text
+{
+  width:20%;
+}
+.hidden-proj_board1
+{
+ display: inline-flex; 
+ position: relative; 
+}
+.inner-bottom{
+  position: relative; 
+}
+.inline-charts
+{
+  display: flex;
 }
