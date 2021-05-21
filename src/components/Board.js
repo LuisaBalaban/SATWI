@@ -7,6 +7,7 @@ import { TwitterTimelineEmbed } from 'react-twitter-embed';
 import Chart from "react-google-charts";
 import ProjectMenu2 from '../container/ProjectMenu2';
 import ProjectMenu3 from '../container/ProjectMenu3';
+import Competitor from '../container/Competitor';
 
 class Board extends React.Component {
     constructor(props) {
@@ -40,7 +41,9 @@ class Board extends React.Component {
             avgPolarityTrigger1: this.props.location.state.avgPolarityTrigger1,
             impactedFollowersTrigger1: this.props.location.state.impactedFollowersTrigger1,
             hashtagTrigger1: this.props.location.state.hashtagTrigger1,
-            mostFollowedTrigger1: this.props.location.state.mostFollowedTrigger1.noProjects,
+            mostFollowedTrigger1: this.props.location.state.mostFollowedTrigger1,
+            timeline1: this.props.location.state.timeline1,
+            mostRetweetedTrigger1:this.props.location.state.mostRetweetedTrigger1,
             //project 2
             countPoz2: this.props.location.state.countPoz2,
             countNeg2: this.props.location.state.countNeg2,
@@ -58,6 +61,8 @@ class Board extends React.Component {
             impactedFollowersTrigger2: this.props.location.state.impactedFollowersTrigger2,
             hashtagTrigger2: this.props.location.state.hashtagTrigger2,
             mostFollowedTrigger2: this.props.location.state.mostFollowedTrigger2,
+            timeline2: this.props.location.state.timeline2,
+
             //project 3
             countPoz3: this.props.location.state.countPoz3,
             countNeg3: this.props.location.state.countNeg3,
@@ -74,7 +79,16 @@ class Board extends React.Component {
             avgPolarityTrigger3: this.props.location.state.avgPolarityTrigger3,
             impactedFollowersTrigger3: this.props.location.state.impactedFollowersTrigger3,
             hashtagTrigger3: this.props.location.state.hashtagTrigger3,
-            mostFollowedTrigger3: this.props.location.state.mostFollowedTrigger3
+            mostFollowedTrigger3: this.props.location.state.mostFollowedTrigger3,
+            timeline3: this.props.location.state.timeline3,
+
+            //competitor
+            word_sentiment_negative_competitor:this.props.location.state.word_sentiment_negative_competitor,
+            word_sentiment_positive_competitor: this.props.location.state.word_sentiment_positive_competitor,
+            countPozCompetitor: this.props.location.state.countPozCompetitor,
+            countNegCompetitor: this.props.location.state.countNegCompetitor,
+            timelineCompetitor:this.props.location.state.timelineCompetitor,
+
 
 
         }
@@ -90,17 +104,17 @@ class Board extends React.Component {
         console.log(this.state.tweets1)
         console.log(this.state.feature1)
         console.log(this.state.projectName1)
-        console.log(this.state.competitor)
+        console.log(this.state.timeline2)
         this.state.resultedTweets = this.state.tweets1.map(s => ([s]))
         return (
             <div>
-            <div className="inline-charts">
+                <div className="inline-charts">
 
 
-                <div className="vertical">
+                    <div className="vertical">
 
 
-                   
+
                         <div className="box">
 
                             <div className="vertical">
@@ -269,6 +283,33 @@ class Board extends React.Component {
                                                     <h4>{this.state.hashtagTrigger1}</h4>
                                                 </div>
                                             </div>
+                                            <div className="inline-charts">
+                                            <Chart
+                                                width={'600px'}
+                                                height={'400px'}
+                                                chartType="LineChart"
+                                                loader={<div>Loading Chart</div>}
+                                                
+                                                data={[
+                                                    ['date', 'count'],
+                                                    ...this.state.timeline1
+                                                ]
+                                                }
+                                                
+                                                options={{
+                                                    hAxis: {
+                                                        title: 'Date',
+                                                    },
+                                                    vAxis: {
+                                                        title: 'No of Tweets',
+                                                    },legend: 'none',
+                                                    series: {
+                                                        0: { color: '#9888b5' }}
+                                                }}
+                                                rootProps={{ 'data-testid': '1' }}
+                                            />
+                                               <TweetEmbed options={{ width: 250 }} id={this.state.mostRetweetedTrigger1} />
+                                               </div>
                                         </div>
                                     </div>
                                 </div>
@@ -276,21 +317,22 @@ class Board extends React.Component {
 
 
                             </div>
-                            
+
                         </div>
-                        
-                  
-                    
-                    <div>{this.state.noProjects ? <ProjectMenu2/> : ''}</div>
-                <div>{this.state.noProjects==3 ? <ProjectMenu3/> : ''}</div>
+
+
+
+                        <div>{this.state.noProjects == 2 ? <ProjectMenu2 /> : ''}</div>
+                        <div>{this.state.noProjects == 3 ? <ProjectMenu3 /> : ''}</div>
+                        <div>{this.state.competitor ? <Competitor /> : ''}</div>
+                    </div>
+                    <TwitterTimelineEmbed
+                        sourceType="profile"
+                        screenName={this.state.username}
+                        options={{ height: 50, width: 250, tweetLimit: 10 }}
+                    />
                 </div>
-                <TwitterTimelineEmbed
-                    sourceType="profile"
-                    screenName={this.state.username}
-                    options={{ height: 50, width: 200, tweetLimit: 10 }}
-                />
-                </div>
-                {/* project2 */}
+                
 
             </div>
 

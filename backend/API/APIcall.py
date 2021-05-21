@@ -41,6 +41,7 @@ hashtags_text=[]
 hashtags_pairing_id={}
 hashtags_freq={}
 most_used_hashtag=0
+created_at=[]
 def creatingTestSet(searched_keyword):
    
    global tweets_rt
@@ -60,6 +61,7 @@ def creatingTestSet(searched_keyword):
    global hashtags_freq
    global hashtags_pairing_id
    global most_used_hashtag
+   global created_at
    hashtags=[]
    most_used_hashtag=0
    all_followers=0
@@ -78,18 +80,15 @@ def creatingTestSet(searched_keyword):
    total_no_tweets=0
    total_no_rtweets=0
    hashtags_pairing_id={}
+   created_at=[]
    for tweet_info in tweepy.Cursor(api.search, q=searched_keyword,rpp=50, lang="en", tweet_mode='extended', type='popular').items(50):
-     print('****************TWEET  INFO*****************')
-     print(tweet_info)
+     created_at.append(tweet_info.created_at)
      if 'retweeted_status' in dir(tweet_info):
                tweet=tweet_info.retweeted_status.full_text
                retweets.append(tweet)
                if tweet_info.retweet_count > rt_count:
                  rt_count=tweet_info.retweet_count
                  most_retweeted=tweet_info.id
-                #  print(tweet_info.id)
-                #  print("*****TWEET USER FOLLOWERS COUNT*****8")
-                #  print(tweet_info.user.followers_count)
                if tweet_info.user.followers_count>max_fav_count:
                  max_fav_count=tweet_info.user.followers_count
                  
@@ -113,26 +112,12 @@ def creatingTestSet(searched_keyword):
                 #  print(tweet_info.id)
      hashtags_freq=Counter(hashtags_text)         
      all_followers+=tweet_info.user.followers_count
-     total_no_tweets+=1        
+     total_no_tweets+=1   
      res.append(tweet) 
      tweets_rt[tweet]=tweet_info.retweet_count
-  #    print(tweet)
-  #    print('-----------------')
-  #  print(res)
-  #  print('--------TWEETS RT---------')
-  #  print(tweets_rt)
-  #  print('-************-')
-  #  print(most_retweeted)
-  #  print("-----")
-  #  print(max_faved)
-  #  print('***********************')
-  #  print(hashtags_text)
-  #  print(hashtags_freq)
-  #  print(list(hashtags_freq)[0])
-  #  print(hashtags_pairing_id)
    if list(hashtags_freq):  
     most_used_hashtag=hashtags_pairing_id[list(hashtags_freq)[0]]
-  #  print(most_used_hashtag)
+ 
    allTweets=''
    for tweet in res:
      tweet=preprocess._processTweet(tweet)
@@ -155,9 +140,12 @@ def creatingTestSet(searched_keyword):
         if word==word_freq:
          totalRTS+=tweets_rt[value]
          rt_paired_freq[word]=[totalRTS,word_rt[0]]
-  #  print(sorteddict)
-  #  print('d-----------------------')
-  #  print(rt_paired_freq)
+   dataframe_Timeline=pd.DataFrame(created_at, columns=['date'])
+   dataframe_Timeline['day/month/year/hh'] = dataframe_Timeline['date'].apply(lambda x: "%d-%d-%d %d" % (x.month, x.day, x.year, x.hour))
+   dataframe_Timeline= dataframe_Timeline.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
+   timeline=dataframe_Timeline.to_numpy()
+   timeline=timeline.tolist()
+   print(timeline)
    return [tweet for tweet in res]
 
 def count():

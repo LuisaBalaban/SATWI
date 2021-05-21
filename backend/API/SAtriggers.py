@@ -12,7 +12,8 @@ import tensorflow as tf
 from flask import jsonify
 from API import APIcall as APIcall
 from API import Preprocess as preprocess
-import json
+from API import APIcallBrand as APIcallBrand
+import json 
 from nltk.corpus import stopwords
 spam_words=['act','get','got','like','please','make','buy','call','click','compare','free','get','open','opt','order','order','miss','yourself','Sign','Stop','subscription','link','chance','next','unsubscribe','visit','Competitions','Congratulations','giveaway','prize','prizes','Win','Winner','Won','winner','selected','Order','shipped','retweet','follow','$$$', 'dollars','cash','think','least','would','could','already','away','us','says', '-', '_', 'im', 'still', 'back', 'deal!', 'deal', 'go', 'like', 'said','one', 'mates']
 for w in spam_words:
@@ -52,15 +53,16 @@ def loadModel(preprocessedSearchedTweets):
  average=average/i
  jsonData={"labeledTweets":[labeledTweets],
            "results":[polarityvals],
-           "count":APIcall.count(),
-           "mostRetweeted":str(APIcall.most_retweeted),
+           "count":APIcallBrand.count(),
+           "mostRetweeted":str(APIcallBrand.most_retweeted),
            "polarity":added_polarity,
-           "max_followers":str(APIcall.max_faved),
-           "total_no_rtweets":APIcall.total_no_rtweets,
-           "total_no_tweets":APIcall.total_no_tweets,
-           "all_followers":APIcall.all_followers,
+           "max_followers":str(APIcallBrand.max_faved),
+           "total_no_rtweets":APIcallBrand.total_no_rtweets,
+           "total_no_tweets":APIcallBrand.total_no_tweets,
+           "all_followers":APIcallBrand.all_followers,
         #    "most_used_hashtag":str(APIcall.most_used_hashtag),
-           "most_used_hashtag":APIcall.hashtags_text,
-           "average":average*100}
+           "most_used_hashtag":APIcallBrand.hashtags_text,
+           "average":average*100,
+           "timeline":APIcallBrand.timeline}
  print(jsonData)
  return jsonData

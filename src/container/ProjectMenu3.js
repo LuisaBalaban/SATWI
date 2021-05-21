@@ -23,7 +23,9 @@ class ProjectMenu3 extends React.Component {
             avgPolarityTrigger3: this.props.location.state.avgPolarityTrigger3,
             impactedFollowersTrigger3: this.props.location.state.impactedFollowersTrigger3,
             hashtagTrigger3: this.props.location.state.hashtagTrigger3,
-            mostFollowedTrigger3: this.props.location.state.mostFollowedTrigger3
+            mostFollowedTrigger3: this.props.location.state.mostFollowedTrigger3,
+            timeline3: this.props.location.state.timeline3,
+            mostRetweetedTrigger3: this.props.location.state.mostRetweetedTrigger3,
         }
     }
     render() {
