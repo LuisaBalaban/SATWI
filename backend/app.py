@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template
 from flask import request
 from API import APIcall
 from flask import jsonify
+import csv
 from API import Preprocess
 from API import APIcallBrand
 from API import SA 
@@ -28,26 +29,38 @@ def result():
 @app.route('/board', methods = ['POST'])
 @cross_origin()
 def brand():
-  feature1 = request.json['feature1']
-  feature2 = request.json['feature2']
-  trigger1 = request.json['trigger1']
-  trigger2 = request.json['trigger2']
+  features=[]
+  triggers=[]
+  dates=[]
+  noProjects=request.json['noProjects']
+  if noProjects >= 1:
+   feature1 = request.json['feature1']
+   trigger1 = request.json['trigger1']
+   date1 = request.json['date1']
+   date1 = request.json['date1']
+   features.append(feature1)
+   triggers.append(trigger1)
+   dates=[date1]
+   if noProjects >= 2:
+    feature2 = request.json['feature2']
+    trigger2 = request.json['trigger2']
+    date2 = request.json['date2']
+    features.append(feature2)
+    triggers.append(trigger2)
+    dates.append(date2)
+    if noProjects==3:
+      feature3=request.json['feature3']
+      trigger3=request.json['trigger3']
+      date3 = request.json['date3']
+      features.append(feature3)
+      triggers.append(trigger3)
+      dates.append(date3)
   username = request.json['username']
   competitor=request.json['competitor']
-  print(feature1)
-  date1 = request.json['date1']
-  date2 = request.json['date2']
-  print(date1)
-  type(date1)
+  print(features)
+  print(dates)
+  print(triggers)
   jsonfeatures={}
-  if not feature2:
-    features=[feature1]
-    triggers=[trigger1]
-    dates=[date1]
-  else:
-   features=[feature1,feature2]
-   triggers=[trigger1, trigger2]
-   dates=[date1,date2]
   i=0
   for feature in features:
     query1=feature+' '+username+' since:'+dates[i]
@@ -68,7 +81,7 @@ def brand():
   set3=APIcall.creatingTestSet(competitor)
   preprocessedSearchedTweets3=Preprocess.processTweets(set3)
   labeledTweets3=SA.loadModel(preprocessedSearchedTweets3)
-  jsonfeatures[trigger]=labeledTweets3
+  jsonfeatures[competitor]=labeledTweets3
   print(type(jsonfeatures))
   jsonfeatures=jsonify(jsonfeatures)
   # print(type(jsonfeatures))

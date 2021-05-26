@@ -35,8 +35,13 @@ class ProjectMenu2 extends React.Component {
     }
     render() {
         console.log(this.state.timeline2)
+        console.log(this.state.projectName2)
+        console.log(this.state.count_tweets2)
+        console.log(this.state.count_retweets2)
+        console.log(this.state.mostRetweetedTrigger2)
         return (
             <div >
+
 
                 <div className="box">
 
@@ -46,7 +51,6 @@ class ProjectMenu2 extends React.Component {
                         <hr class="rounded"></hr>
                         <h2 id="feature">Researched feature: {this.state.feature2}</h2>
                         <div className="hidden-proj_board1">
-
                             <TweetEmbed options={{ width: 250 }} id={this.state.max_followers2} />
                             <div className="vertical">
                                 <div className="inline-charts">
@@ -110,7 +114,7 @@ class ProjectMenu2 extends React.Component {
                                     />
                                     <Chart
                                         width={'300px'}
-                                        height={'200px'}
+                                        height={'250px'}
                                         chartType="Histogram"
                                         loader={<div>Loading Chart</div>}
                                         data={[
@@ -186,48 +190,57 @@ class ProjectMenu2 extends React.Component {
 
                                 <div className="inner-bottom">
                                     <div className="inline-charts">
-                                        <h3 id="trigger-text">Trigger: {this.state.trigger2}</h3>
                                         <div className="vertical">
-                                            <p id="info">Average polarity:</p>
-                                            <h4>{this.state.avgPolarityTrigger2}</h4>
-                                        </div>
+                                            <div className="inline-charts">
+                                                <h3 id="trigger-text">Trigger: {this.state.trigger2}</h3>
+                                                <Chart
+                                                    width={'500px'}
+                                                    height={'350px'}
+                                                    chartType="LineChart"
+                                                    loader={<div>Loading Chart</div>}
 
-                                        <div className="vertical">
-                                            <p id="info">Reached users:</p>
-                                            <h4>{this.state.impactedFollowersTrigger2}</h4>
-                                        </div>
-                                        <div className="vertical">
-                                            <p id="info">Associated hashtags:</p>
-                                            <h4>{this.state.hashtagTrigger2}</h4>
-                                        </div>
-                                    </div>
-                                    <div className="inline-charts">
-                                        <Chart
-                                            width={'600px'}
-                                            height={'400px'}
-                                            chartType="LineChart"
-                                            loader={<div>Loading Chart</div>}
+                                                    data={[
+                                                        ['date', 'count'],
+                                                        ...this.state.timeline2
+                                                    ]
+                                                    }
 
-                                            data={[
-                                                ['date', 'count'],
-                                                ...this.state.timeline2
-                                            ]
-                                            }
+                                                    options={{
+                                                        hAxis: {
+                                                            title: 'Date',
+                                                        },
+                                                        vAxis: {
+                                                            title: 'No of Tweets',
+                                                        }, legend: 'none',
+                                                        series: {
+                                                            0: { color: '#9888b5' }
+                                                        }
+                                                    }}
+                                                    rootProps={{ 'data-testid': '1' }}
+                                                />
+                                            </div>
 
-                                            options={{
-                                                hAxis: {
-                                                    title: 'Date',
-                                                },
-                                                vAxis: {
-                                                    title: 'No of Tweets',
-                                                }, legend: 'none',
-                                                series: {
-                                                    0: { color: '#9888b5' }
-                                                }
-                                            }}
-                                            rootProps={{ 'data-testid': '1' }}
-                                        />
+                                            <div className="inline-charts">
+                                                <div className="vertical">
+                                                    <p id="info">Average polarity:</p>
+                                                    <h4>{this.state.avgPolarityTrigger2}</h4>
+                                                </div>
+
+                                                <div className="vertical">
+                                                    <p id="info">Reached users:</p>
+                                                    <h4>{this.state.impactedFollowersTrigger2}</h4>
+                                                </div>
+                                                <div className="vertical">
+                                                    <p id="info">Associated hashtags:</p>
+                                                    <h4>{this.state.hashtagTrigger2}</h4>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
                                         <TweetEmbed options={{ width: 250 }} id={this.state.mostRetweetedTrigger2} />
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -236,6 +249,7 @@ class ProjectMenu2 extends React.Component {
 
 
                     </div>
+
                 </div>
             </div>);
     }

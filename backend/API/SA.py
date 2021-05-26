@@ -77,7 +77,7 @@ def loadModel(preprocessedSearchedTweets):
 #   print(word)
 #   print(APIcall.rt_paired_freq[word][0])
 #   print(added_polarity[word])
-  if APIcall.rt_paired_freq[word][1]>=5:
+  if APIcall.rt_paired_freq[word][1]>=2:
     if word not in spam_words:
      if APIcall.rt_paired_freq[word][0]>=2:  
       bubble_chart_data.append([word,added_polarity[word],APIcall.rt_paired_freq[word][1],APIcall.rt_paired_freq[word][0]])
@@ -110,7 +110,8 @@ def loadModel(preprocessedSearchedTweets):
            "all_followers":APIcall.all_followers,
            "most_used_hashtag":str(APIcall.most_used_hashtag),
            "word_sentiment_positive":word_sentiment_positive,
-           "word_sentiment_negative":word_sentiment_negative}
+           "word_sentiment_negative":word_sentiment_negative,
+           "timeline":APIcall.timeline}
  print(jsonData)
  return jsonData
 

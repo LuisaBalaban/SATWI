@@ -129,12 +129,16 @@ class BoardConfig extends React.Component {
             body: JSON.stringify({
                 feature1: this.state.feature1,
                 feature2: this.state.feature2,
+                feature3: this.state.feature3,
                 trigger1: this.state.trigger1,
                 trigger2: this.state.trigger2,
+                trigger3: this.state.trigger3,
                 username: this.state.username,
                 date1: this.state.date1,
                 date2: this.state.date2,
-                competitor:this.state.competitor
+                date3: this.state.date3,
+                competitor:this.state.competitor,
+                noProjects:this.state.noProjects
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -203,7 +207,7 @@ class BoardConfig extends React.Component {
                         max_followers2: ((json[this.state.feature2] ? json[this.state.feature2].max_followers : '')),
                         all_followers2: ((json[this.state.feature2] ? json[this.state.feature2].all_followers : "")),
                         most_used_hashtag2: ((json[this.state.feature2] ? json[this.state.feature2].most_used_hashtag : "")),
-                        count_tweets2: ((json[this.state.feature2] ? Object.keys(json[this.state.feature2].labeledTweets[0]) : "")),
+                        tweets2: ((json[this.state.feature2] ? Object.keys(json[this.state.feature2].labeledTweets[0]) : "")),
                         bubble_chart_data2: ((json[this.state.feature2] ? json[this.state.feature2].bubble_chart_data : "")),
                         projectName2: ((json[this.state.feature2] ? this.state.projectName2 : "")),
                         //project 2 - trigger
@@ -224,7 +228,7 @@ class BoardConfig extends React.Component {
                         max_followers3: ((json[this.state.feature3] ? json[this.state.feature3].max_followers : "")),
                         all_followers3: ((json[this.state.feature3] ? json[this.state.feature3].all_followers : "")),
                         most_used_hashtag3: ((json[this.state.feature3] ? json[this.state.feature3].most_used_hashtag : "")),
-                        count_tweets3: ((json[this.state.feature3] ? Object.keys(json[this.state.feature3].labeledTweets[0]) : "")),
+                        tweets3: ((json[this.state.feature3] ? Object.keys(json[this.state.feature3].labeledTweets[0]) : "")),
                         bubble_chart_data3: ((json[this.state.feature3] ? json[this.state.feature3].bubble_chart_data : "")),
                         projectName3: this.state.projectName3,
                         //project 3 - trigger
@@ -238,9 +242,9 @@ class BoardConfig extends React.Component {
                         //competitor
                         word_sentiment_negative_competitor: ((json[this.state.competitor] ? json[this.state.competitor].word_sentiment_negative : "")),
                         word_sentiment_positive_competitor: ((json[this.state.competitor] ? json[this.state.competitor].word_sentiment_positive : "")),
-                        countPozCompetitor: ((json[this.state.competitor] ? json[this.state.competitor].word_sentiment_positive : "")),
+                        timelineCompetitor: ((json[this.state.competitor] ? json[this.state.competitor].timeline : "")),
                         countNegCompetitor: ((json[this.state.competitor] ? (JSON.stringify(Object.values(json[this.state.competitor].labeledTweets)).match(/Negative/g) || []).length : "")),
-                        timelineCompetitor:  ((json[this.state.competitor] ? (JSON.stringify(Object.values(json[this.state.competitor].labeledTweets)).match(/Negative/g) || []).length : "")),
+                        countPozCompetitor:  ((json[this.state.competitor] ? (JSON.stringify(Object.values(json[this.state.competitor].labeledTweets)).match(/Positive/g) || []).length : "")),
                     }
                 });
             })

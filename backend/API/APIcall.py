@@ -25,6 +25,7 @@ auth.set_access_token(connect.access_token_key, connect.access_token_secret)
 
 api = tweepy.API(auth)
 retweets=[]
+timeline=[]
 tweets=[]
 wordJSON={}
 most_retweeted=0
@@ -48,6 +49,7 @@ def creatingTestSet(searched_keyword):
    global max_fav_count 
    global all_followers
    global rt_count 
+   global timeline
    global max_faved
    global most_retweeted 
    global rt_paired_freq
@@ -69,6 +71,7 @@ def creatingTestSet(searched_keyword):
    retweets=[]
    no_hashtags=0
    tweets=[]
+   timeline=[]
    rt_paired_freq={}
    res = []
    tweets_rt={}

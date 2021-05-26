@@ -43,7 +43,7 @@ class Board extends React.Component {
             hashtagTrigger1: this.props.location.state.hashtagTrigger1,
             mostFollowedTrigger1: this.props.location.state.mostFollowedTrigger1,
             timeline1: this.props.location.state.timeline1,
-            mostRetweetedTrigger1:this.props.location.state.mostRetweetedTrigger1,
+            mostRetweetedTrigger1: this.props.location.state.mostRetweetedTrigger1,
             //project 2
             countPoz2: this.props.location.state.countPoz2,
             countNeg2: this.props.location.state.countNeg2,
@@ -83,11 +83,11 @@ class Board extends React.Component {
             timeline3: this.props.location.state.timeline3,
 
             //competitor
-            word_sentiment_negative_competitor:this.props.location.state.word_sentiment_negative_competitor,
+            word_sentiment_negative_competitor: this.props.location.state.word_sentiment_negative_competitor,
             word_sentiment_positive_competitor: this.props.location.state.word_sentiment_positive_competitor,
             countPozCompetitor: this.props.location.state.countPozCompetitor,
             countNegCompetitor: this.props.location.state.countNegCompetitor,
-            timelineCompetitor:this.props.location.state.timelineCompetitor,
+            timelineCompetitor: this.props.location.state.timelineCompetitor,
 
 
 
@@ -105,6 +105,8 @@ class Board extends React.Component {
         console.log(this.state.feature1)
         console.log(this.state.projectName1)
         console.log(this.state.timeline2)
+        console.log(this.state.noProjects)
+        console.log(this.state.countPozCompetitor)
         this.state.resultedTweets = this.state.tweets1.map(s => ([s]))
         return (
             <div>
@@ -187,7 +189,7 @@ class Board extends React.Component {
                                             />
                                             <Chart
                                                 width={'300px'}
-                                                height={'200px'}
+                                                height={'250px'}
                                                 chartType="Histogram"
                                                 loader={<div>Loading Chart</div>}
                                                 data={[
@@ -263,53 +265,57 @@ class Board extends React.Component {
 
                                         <div className="inner-bottom">
                                             <div className="inline-charts">
+                                                <div className="vertical">
+                                                    <div className="inline-charts">
+                                                        <h3 id="trigger-text">Trigger: {this.state.trigger1}</h3>
+                                                        <Chart
+                                                            width={'500px'}
+                                                            height={'350px'}
+                                                            chartType="LineChart"
+                                                            loader={<div>Loading Chart</div>}
 
-                                                {/* <div className="vertical">
-                                    <p id="info">Number of reached users:</p>
-                                        <h4>{this.state.all_followers1}</h4>
-                                        </div> */}
-                                                <h3 id="trigger-text">Trigger: {this.state.trigger1}</h3>
-                                                <div className="vertical">
-                                                    <p id="info">Average polarity:</p>
-                                                    <h4>{this.state.avgPolarityTrigger1}</h4>
-                                                </div>
+                                                            data={[
+                                                                ['date', 'count'],
+                                                                ...this.state.timeline1
+                                                            ]
+                                                            }
 
-                                                <div className="vertical">
-                                                    <p id="info">Reached users:</p>
-                                                    <h4>{this.state.impactedFollowersTrigger1}</h4>
+                                                            options={{
+                                                                hAxis: {
+                                                                    title: 'Date',
+                                                                },
+                                                                vAxis: {
+                                                                    title: 'No of Tweets',
+                                                                }, legend: 'none',
+                                                                series: {
+                                                                    0: { color: '#9888b5' }
+                                                                }
+                                                            }}
+                                                            rootProps={{ 'data-testid': '1' }}
+                                                        />
+                                                    </div>
+
+                                                    <div className="inline-charts">
+                                                        <div className="vertical">
+                                                            <p id="info">Average polarity:</p>
+                                                            <h4>{this.state.avgPolarityTrigger1}</h4>
+                                                        </div>
+
+                                                        <div className="vertical">
+                                                            <p id="info">Reached users:</p>
+                                                            <h4>{this.state.impactedFollowersTrigger1}</h4>
+                                                        </div>
+                                                        <div className="vertical">
+                                                            <p id="info">Associated hashtags:</p>
+                                                            <h4>{this.state.hashtagTrigger1}</h4>
+
+                                                        </div>
+
+                                                    </div>
+
                                                 </div>
-                                                <div className="vertical">
-                                                    <p id="info">Associated hashtags:</p>
-                                                    <h4>{this.state.hashtagTrigger1}</h4>
-                                                </div>
+                                                <TweetEmbed options={{ width: 250 }} id={this.state.mostRetweetedTrigger1} />
                                             </div>
-                                            <div className="inline-charts">
-                                            <Chart
-                                                width={'600px'}
-                                                height={'400px'}
-                                                chartType="LineChart"
-                                                loader={<div>Loading Chart</div>}
-                                                
-                                                data={[
-                                                    ['date', 'count'],
-                                                    ...this.state.timeline1
-                                                ]
-                                                }
-                                                
-                                                options={{
-                                                    hAxis: {
-                                                        title: 'Date',
-                                                    },
-                                                    vAxis: {
-                                                        title: 'No of Tweets',
-                                                    },legend: 'none',
-                                                    series: {
-                                                        0: { color: '#9888b5' }}
-                                                }}
-                                                rootProps={{ 'data-testid': '1' }}
-                                            />
-                                               <TweetEmbed options={{ width: 250 }} id={this.state.mostRetweetedTrigger1} />
-                                               </div>
                                         </div>
                                     </div>
                                 </div>
@@ -322,17 +328,19 @@ class Board extends React.Component {
 
 
 
-                        <div>{this.state.noProjects == 2 ? <ProjectMenu2 /> : ''}</div>
+                        <div>{this.state.noProjects >= 2 ? <ProjectMenu2 /> : ''}</div>
                         <div>{this.state.noProjects == 3 ? <ProjectMenu3 /> : ''}</div>
                         <div>{this.state.competitor ? <Competitor /> : ''}</div>
                     </div>
+                    <div className="tweet-Timeline">
                     <TwitterTimelineEmbed
                         sourceType="profile"
                         screenName={this.state.username}
                         options={{ height: 50, width: 250, tweetLimit: 10 }}
                     />
+                    </div>
                 </div>
-                
+
 
             </div>
 

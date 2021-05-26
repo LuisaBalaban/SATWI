@@ -18,6 +18,7 @@ class Competitor extends React.Component {
         }
     }
     render() {
+        console.log(this.state.countPozCompetitor)
         return (
             <div className="vertical">
 
@@ -25,11 +26,12 @@ class Competitor extends React.Component {
                 <section>
                     <div id="box-competitor" className="box">
                         <div className="vertical">
-                            <h1>{this.state.competitor}</h1>
-                            <div className="inline-charts"> <section>
+                        <h1>Competitor analysis - {this.state.competitor}</h1>
+                        <hr class="rounded"></hr>
+                            <div className="inline-charts"> 
                                 <Chart
                                     width={'500px'}
-                                    height={'500px'}
+                                    height={'200px'}
                                     chartType="BarChart"
                                     loader={<div>Loading Chart</div>}
                                     data={[
@@ -39,7 +41,7 @@ class Competitor extends React.Component {
                                     options={{
                                         title: 'Most recurrent negative words',
                                         legend: { position: "none" },
-                                        backgroundColor: '#dddbf3',
+                                        backgroundColor: '#ddddd',
                                         color: 'red',
 
                                         hAxis: {
@@ -55,7 +57,7 @@ class Competitor extends React.Component {
                                 />
                                 <Chart
                                     width={'500px'}
-                                    height={'500px'}
+                                    height={'200px'}
                                     chartType="BarChart"
                                     loader={<div>Loading Chart</div>}
                                     data={[
@@ -65,7 +67,7 @@ class Competitor extends React.Component {
                                     options={{
                                         title: 'Most recurrent positive words',
                                         legend: { position: "none" },
-                                        backgroundColor: '#dddbf3',
+                                        backgroundColor: '#ddddd',
                                         color: 'red',
 
                                         hAxis: {
@@ -79,9 +81,12 @@ class Competitor extends React.Component {
 
                                     rootProps={{ 'data-testid': '1' }}
                                 />
+                                
+                                </div><div className="vertical">
+                                <div className="inline-charts"> 
                                 <Chart
                                     width={'250px'}
-                                    height={'300px'}
+                                    height={'200px'}
                                     chartType="PieChart"
                                     loader={<div>Loading Chart</div>}
                                     data={[
@@ -92,7 +97,7 @@ class Competitor extends React.Component {
                                     options={{
                                         title: 'Sentiment partition',
                                         backgroundColor: {
-                                            fill: '#dddbf3',
+                                            fill: '#ddddd',
                                             fillOpacity: 0.8,
                                         },
                                         fontName: 'Reem kufi',
@@ -107,13 +112,13 @@ class Competitor extends React.Component {
                                 />
                                 <Chart
                                     width={'600px'}
-                                    height={'400px'}
+                                    height={'200px'}
                                     chartType="LineChart"
                                     loader={<div>Loading Chart</div>}
 
                                     data={[
                                         ['date', 'count'],
-                                        ...this.state.timelineCompetitor
+                                         ...this.state.timelineCompetitor
                                     ]
                                     }
 
@@ -131,7 +136,7 @@ class Competitor extends React.Component {
                                     rootProps={{ 'data-testid': '1' }}
                                 />
                                 
-                            </section>
+                           </div>
                             </div>
                         </div>
                     </div>
