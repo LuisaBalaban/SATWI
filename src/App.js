@@ -7,6 +7,7 @@ import {
   useRouteMatch
 } from "react-router-dom";
 import Routes from './Routes';
+import GoogleLogin from 'react-google-login'
 import React from 'react';
 import landingImage from './images/landing.svg'
 import Lottie from './Lottie.js'
@@ -18,6 +19,26 @@ import downArrowSmall from './images/Arrow-down.svg.png'
 import { withRouter } from 'react-router-dom';
 
 class App extends React.Component {
+
+  responseGoogle=(response)=>{
+    console.log(response);
+    console.log(response.profileObj);
+    fetch("http://127.0.0.1:5000/profileBoard", {
+            method: "POST",
+            body: JSON.stringify({
+                profile: response.profileObj
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+        }
+        ).then(response => {
+          console.log(response)
+          return response.json()
+      })
+    
+  }
   constructor() {
     super();
     this.state = {
@@ -63,6 +84,7 @@ class App extends React.Component {
   }
   loginBrand()
   {
+    
     this.props.history.push({ pathname: '/login'})
   }
   findOutMore()
@@ -142,7 +164,15 @@ class App extends React.Component {
                     <div id="EnterpriseDropDown" class="dropdown-content">
           <section>
           <p> Explore your board and connect to your customers.</p>
-         <button onClick={this.loginBrand} className="btn-user">Log in</button>
+         {/* <button onClick={this.loginBrand} className="btn-user">Log in</button> */}
+         <div id="signInButton"><GoogleLogin
+        clientId={process.env.GOOGLE_CLIENT_ID}
+        buttonText="Login"
+        onSuccess={this.responseGoogle}
+        onFailure={this.responseGoogle}
+        cookiePolicy={'single_host_origin'}
+        
+        /></div>
           </section></div>
           </div>
         <div>

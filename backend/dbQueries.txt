@@ -1,0 +1,32 @@
+CREATE TABLE USERS(ProvidedUserId INT NOT NULL,Username VARCHAR (20) NOT NULL,Phone VARCHAR (20) NOT NULL,Email CHAR (25) ,FirstName varchar (40),  LastName varchar (40),  Locale  varchar(200),Name varchar(90),   PRIMARY KEY (ProvidedUserId);
+
+CREATE TABLE Boards (
+    BoardId int NOT NULL,
+    ProvidedUserId INT NOT NULL,
+    Competitor  VARCHAR (20),
+    TwitterHandle  VARCHAR (20) NOT NULL,
+    ReceiveRecommendations BOOLEAN,
+    ReceiveEmails BOOLEAN,
+    ReceiveMonthlyReport BOOLEAN,
+    Project VARCHAR (20),
+    PRIMARY KEY (BoardId),
+    FOREIGN KEY (ProvidedUserId) REFERENCES USERS(ProvidedUserId)
+);
+
+CREATE TABLE Subscriptions (
+    ProvidedUserId INT NOT NULL,
+    ActivationDate DATE,
+    ExpirationDate DATE,
+    ActivationStatus BOOLEAN, 
+    FOREIGN KEY (ProvidedUserId) REFERENCES USERS(ProvidedUserId)
+);
+
+
+CREATE TABLE Projects (
+  BoardId INT NOT NULL,
+  ProjectName VARCHAR (20) NOT NULL,
+  Feature VARCHAR (20) NOT NULL,
+  TriggerFeature VARCHAR (20),
+  Date DATE,
+  FOREIGN KEY (BoardId) REFERENCES Boards(BoardId)
+);

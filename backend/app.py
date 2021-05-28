@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template
 from flask import request
+import environ
 from API import APIcall
 from flask import jsonify
 import csv
@@ -9,12 +10,18 @@ from API import SA
 from API import SAtriggers
 import json
 from flask_cors import CORS, cross_origin
+from flask_mysqldb import MySQL
+import yaml
 app = Flask(__name__, template_folder="components")
-
 app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app)
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] =  os.environ.get('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')
+mysql=MySQL(app)
 
-  
+
 @app.route('/result', methods = ['POST'])
 @cross_origin()
 def result():
@@ -26,6 +33,7 @@ def result():
   print(type(labeledTweets))
   labeledTweets=jsonify(labeledTweets)
   return labeledTweets
+
 @app.route('/board', methods = ['POST'])
 @cross_origin()
 def brand():
@@ -87,3 +95,26 @@ def brand():
   # print(type(jsonfeatures))
   return jsonfeatures
 
+@app.route('/profileBoard', methods = ['POST'])
+@cross_origin()
+def profileBoard():
+  conn = mysql.connect
+  cursor = conn.cursor()
+  profile = request.json['profile']
+  providedUserId=profile['googleId']
+  name=profile['name']
+  email=profile['email']
+  firstName=profile['givenName']
+  lastName=profile['familyName']
+  cursor.execute("SELECT Name, Email from USERS WHERE ProvidedUserId LIKE %s", [providedUserId])
+  conn.commit()
+  data = cursor.fetchall()
+  print(data)
+  if data:
+     cursor.execute("SELECT TwitterHandle, Competitor from Boards WHERE ProvidedUserId LIKE %s", [providedUserId])
+     conn.commit()
+     data1 = cursor.fetchall()
+     print(data1)
+     return data1
+  else:
+     return "no user with that id in database"
