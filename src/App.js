@@ -1,4 +1,5 @@
 import './index.css';
+import './elements.css';
 import {
   BrowserRouter as Router,
   Switch,
@@ -35,7 +36,38 @@ class App extends React.Component {
         }
         ).then(response => {
           console.log(response)
+          if(response.status==200)
+          {
+            this.setState({ pathname: '/board'})
+          }
           return response.json()
+
+      }) .then(json => {
+        console.log(json)
+        console.log(json['body'])
+        this.props.history.push({ pathname: '/board',
+        state: {
+            isLogin:true,
+            username: json['body'][0][1],
+            competitor:json['body'][0][2],
+            projectName1:json['body'][2][0][0],
+            feature1:json['body'][2][0][1],
+            trigger1: json['body'][2][0][2],
+            date1:json['body'][2][0][3],
+            projId1:json['body'][2][0][4],
+            projectName2: json['body'][2][1] ? json['body'][2][1][0] : '' ,
+            feature2:json['body'][2][1] ? json['body'][2][1][1] : '',
+            trigger2: json['body'][2][1] ? json['body'][2][1][2]  : '',
+            date2:json['body'][2][1] ? json['body'][2][1][3] : '',
+            projId2:json['body'][2][1] ? json['body'][2][1][4]  :'',
+            projectName3: json['body'][2][2] ? json['body'][2][2][0] : '',
+            feature3: json['body'][2][2] ?json['body'][2][2][1]:'',
+            trigger3: json['body'][2][2]? json['body'][2][2][2]:'',
+            date3: json['body'][2][2]? json['body'][2][2][3]:'',
+            projId3:json['body'][2][2]? json['body'][2][2][4]:'',
+            noProjects: json['body'][2][1]?  json['body'][2][2][0] ? 3 : 2 : 1
+          }
+          })
       })
     
   }
@@ -43,7 +75,8 @@ class App extends React.Component {
     super();
     this.state = {
     scrollEnd:'',
-    scrollEnd2:''
+    scrollEnd2:'',
+    pathname:''
     }
 
     this.findOutMore=this.findOutMore.bind(this);
@@ -95,7 +128,7 @@ class App extends React.Component {
   }
   goPro()
   {
-    this.props.history.push({ pathname: '/board-config'})
+    this.props.history.push({ pathname: '/login'})
   }
   render() {
 
@@ -109,7 +142,7 @@ class App extends React.Component {
         <div className="centered-title">
         <h1>What is your      favourite brand’s online persona?</h1>
         <div id="outer">
-        <div class="inner"><button   onClick={this.findOutMore}><img id="down-arrow" src={downArrowSmall}/></button> </div>
+        <div class="inner"><button class="buttonSpecial"  onClick={this.findOutMore}><img id="down-arrow" src={downArrowSmall}/></button> </div>
         
         </div>
         </div>
@@ -132,7 +165,7 @@ class App extends React.Component {
       <Lottie lotti={magnifier} height={200} width={200} />
       </section>
       <div id="outer">
-        <div class="inner"><button   onClick={this.explore}><img id="down-arrow" src={downArrowSmall}/></button> </div>
+        <div class="inner"><button   class="buttonSpecial" onClick={this.explore}><img id="down-arrow" src={downArrowSmall}/></button> </div>
         
         </div>
       </div>
@@ -166,7 +199,7 @@ class App extends React.Component {
           <p> Explore your board and connect to your customers.</p>
          {/* <button onClick={this.loginBrand} className="btn-user">Log in</button> */}
          <div id="signInButton"><GoogleLogin
-        clientId={process.env.GOOGLE_CLIENT_ID}
+        clientId='332583792653-4sev4321k5ssjukodjmmbbmot21daq12.apps.googleusercontent.com'
         buttonText="Login"
         onSuccess={this.responseGoogle}
         onFailure={this.responseGoogle}

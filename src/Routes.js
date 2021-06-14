@@ -15,10 +15,11 @@ function Routes() {
        <div>
         <Route path="/" exact component={App} />
         </div>  
-        {/* <Route path="/login" component={Login} /> */}
+        <Route path="/login" component={Login} />
         <Route path="/search" component={UserInterface} />
         <Route path="/board" component={Board} />
         <Route path='/board-config' component={BoardConfig}/>
+        {/* <Route path='/board-stats' component={Board}/> */}
 
      </Router>
      

@@ -1023,3 +1023,16 @@ label:active:after {
   height: max-content;
   cursor: pointer;
 }
+#front
+{
+  height:100px;
+}
+.childe
+{
+  height: 100px;
+  width: 200px;
+  margin-bottom: 200px;
+  font-size: 100px;
+  align-items: center;
+  align-content: stretch;
+}

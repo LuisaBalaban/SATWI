@@ -36,6 +36,5 @@ def _processTweet(tweet):
 def processTweets(list_of_tweets):
         processedTweets=[]
         for tweet in list_of_tweets:
-               tweet=translate(tweet)
                processedTweets.append(_processTweet(tweet))
         return processedTweets

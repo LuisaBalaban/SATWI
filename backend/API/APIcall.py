@@ -94,17 +94,16 @@ def creatingTestSet(searched_keyword):
                  most_retweeted=tweet_info.id
                if tweet_info.user.followers_count>max_fav_count:
                  max_fav_count=tweet_info.user.followers_count
-                 
                  max_faved=tweet_info.id
                ht=[]
                if tweet_info.entities.get('hashtags'):
                    hashtags.append(tweet_info.entities['hashtags'])
                    if hashtags[0]:
-                     for t in hashtags[0]:
-                      print(t)
-                      print(t['text'])
-                      hashtags_text.append(t['text'])    
-                      hashtags_pairing_id[t['text']]=tweet_info.id              
+                     for text in hashtags[0]:
+                      print(text)
+                      print(text['text'])
+                      hashtags_text.append(text['text'])    
+                      hashtags_pairing_id[text['text']]=tweet_info.id              
      else:
                tweet=tweet_info.full_text
                tweets.append(tweet)
@@ -112,7 +111,6 @@ def creatingTestSet(searched_keyword):
                if tweet_info.retweet_count > rt_count:
                  rt_count=tweet_info.retweet_count
                  most_retweeted=tweet_info.id
-                #  print(tweet_info.id)
      hashtags_freq=Counter(hashtags_text)         
      all_followers+=tweet_info.user.followers_count
      total_no_tweets+=1   
@@ -120,7 +118,6 @@ def creatingTestSet(searched_keyword):
      tweets_rt[tweet]=tweet_info.retweet_count
    if list(hashtags_freq):  
     most_used_hashtag=hashtags_pairing_id[list(hashtags_freq)[0]]
- 
    allTweets=''
    for tweet in res:
      tweet=preprocess._processTweet(tweet)
@@ -135,8 +132,7 @@ def creatingTestSet(searched_keyword):
    sorteddict=sortFreqDict(freqdict)
    for value in tweets_rt.keys():
     totalRTS=0
-    words=value.split()#words with counted rt
-    # print(words)
+    words=value.split()
     for word in words:
       for word_rt in sorteddict:
         word_freq=word_rt[1]
@@ -148,7 +144,7 @@ def creatingTestSet(searched_keyword):
    dataframe_Timeline= dataframe_Timeline.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
    timeline=dataframe_Timeline.to_numpy()
    timeline=timeline.tolist()
-   print(timeline)
+   #print(timeline)
    return [tweet for tweet in res]
 
 def count():

@@ -1,8 +1,19 @@
-CREATE TABLE USERS(ProvidedUserId INT NOT NULL,Username VARCHAR (20) NOT NULL,Phone VARCHAR (20) NOT NULL,Email CHAR (25) ,FirstName varchar (40),  LastName varchar (40),  Locale  varchar(200),Name varchar(90),   PRIMARY KEY (ProvidedUserId);
+CREATE TABLE USERS(
+  ProvidedUserId decimal (38, 0) NOT NULL,
+  Username VARCHAR (20) NOT NULL,
+  Phone VARCHAR (20) NOT NULL,
+  Email CHAR (100),
+  FirstName varchar (40),
+  LastName varchar (40),
+  Locale varchar(200),
+  Name varchar(90),
+  PRIMARY KEY (ProvidedUserId)
+);
+
 
 CREATE TABLE Boards (
-    BoardId int NOT NULL,
-    ProvidedUserId INT NOT NULL,
+    BoardId BIGINT NOT NULL,
+    ProvidedUserId decimal (38, 0) NOT NULL,
     Competitor  VARCHAR (20),
     TwitterHandle  VARCHAR (20) NOT NULL,
     ReceiveRecommendations BOOLEAN,
@@ -14,7 +25,7 @@ CREATE TABLE Boards (
 );
 
 CREATE TABLE Subscriptions (
-    ProvidedUserId INT NOT NULL,
+    ProvidedUserId decimal (38, 0) NOT NULL,
     ActivationDate DATE,
     ExpirationDate DATE,
     ActivationStatus BOOLEAN, 
@@ -23,10 +34,68 @@ CREATE TABLE Subscriptions (
 
 
 CREATE TABLE Projects (
-  BoardId INT NOT NULL,
+  BoardId BIGINT NOT NULL,
+  ProjectId BIGINT NOT NULL,
   ProjectName VARCHAR (20) NOT NULL,
   Feature VARCHAR (20) NOT NULL,
   TriggerFeature VARCHAR (20),
   Date DATE,
+  PRIMARY KEY (ProjectId),
   FOREIGN KEY (BoardId) REFERENCES Boards(BoardId)
 );
+
+
+
+INSERT INTO Users (ProvidedUserId, Username, Phone, Email, FirstName, LastName, Name)
+VALUES ('105241772264654201263', 'l P.', '+409213278', 'booksaremychoice@gmail.com', 'l ','P.', 'l P.');
+
+ALTER TABLE Users
+MODIFY COLUMN email CHAR (100);
+
+DROP DATABASE satwidb;
+
+INSERT INTO Boards (BoardId, ProvidedUserId, Competitor, TwitterHandle, ReceiveRecommendations, ReceiveEmails, ReceiveMonthlyReport)
+VALUES ('123456789','105241772264654201263', 'Asus', 'Lenovo', TRUE, FALSE, FALSE);  \
+
+INSERT INTO Projects (BoardId, ProjectId, ProjectName, Feature, TriggerFeature, Date, ProjectId)
+VALUES ('123456789', '1111111', 'Project Battery life', 'battery', 'low', '2021-01-01', '98210138');  
+
+INSERT INTO Projects (BoardId, ProjectName, Feature, TriggerFeature, Date, ProjectId)
+VALUES ('123456789','Sound quality', 'sound', 'noise', '2021-05-01', '89132342');  
+
+INSERT INTO Projects (BoardId, ProjectName, Feature, TriggerFeature, Date, ProjectId)
+VALUES ('123456789','Price', 'price', 'expensive', '2021-03-01','73837272'); 
+
+
+CREATE TABLE FeaturesTweets (
+    ProjectID BIGINT NOT NULL,
+    Feature VARCHAR (50) NOT NULL,
+    Tweet  VARCHAR (500) NOT NULL,
+    Label  VARCHAR (20) NOT NULL,
+    Score INT,
+    RetweetCount INT,
+    Followers INT,
+    Hashtags VARCHAR(100),
+    CreatedAt DATETIME,
+    Displayed BOOLEAN,
+    TriggerState BOOLEAN,
+    FOREIGN KEY (ProjectID) REFERENCES Projects(ProjectID)
+);
+
+
+INSERT INTO FeaturesTweets (CustomerName, City, Country)
+VALUES ('Cardinal', 'Stavanger', 'Norway');
+
+ALTER TABLE FeaturesTweets CHARSET=utf8mb4
+
+
+LTER DATABASE satwidb CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+ALTER TABLE satwidb.FeaturesTweets MODIFY COLUMN Tweet VARCHAR(500)
+CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE db.table MODIFY COLUMN my_column VARCHAR(255)
+CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE FeaturesTweets
+ADD DetailedScore FLOAT;

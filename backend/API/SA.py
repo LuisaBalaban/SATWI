@@ -14,7 +14,8 @@ from API import APIcall as APIcall
 from API import Preprocess as preprocess
 import json
 from nltk.corpus import stopwords
-spam_words=['act','get','got','like','please','make','buy','call','click','compare','free','get','open','opt','order','order','miss','yourself','Sign','Stop','subscription','link','chance','next','unsubscribe','visit','Competitions','Congratulations','giveaway','prize','prizes','Win','Winner','Won','winner','selected','Order','shipped','retweet','follow','$$$', 'dollars','cash','think','least','would','could','already','away','us','says', '-', '_', 'im', 'still', 'back', 'deal!', 'deal', 'go', 'like', 'said','one', 'mates']
+# spam_words=['act','get','got','like','please','make','buy','call','click','compare','free','get','open','opt','order','order','miss','yourself','Sign','Stop','subscription','link','chance','next','unsubscribe','visit','Competitions','Congratulations','giveaway','prize','prizes','Win','Winner','Won','winner','selected','Order','shipped','retweet','follow','$$$', 'dollars','cash','think','least','would','could','already','away','us','says', '-', '_', 'im', 'still', 'back', 'deal!', 'deal', 'go', 'like', 'said','one', 'mates']
+spam_words=[]
 for w in spam_words:
  w.lower()
 stop_words = set(stopwords.words('english'))
@@ -57,26 +58,16 @@ def loadModel(preprocessedSearchedTweets):
    for word in words:
     #print(word)
     for word_frq in APIcall.rt_paired_freq.keys():
-      #print(word_frq)
-      if word==word_frq:
-         #print(labeledTweetsDETAILED[tweet])
+      if word.lower()==word_frq.lower():
          polarity=labeledTweetsDETAILED[tweet]
          if word_frq in added_polarity:
           added_polarity[word]=polarity+added_polarity[word_frq]
          else:
           added_polarity[word]=polarity
-    # print(APIcall.rt_paired_freq[word_frq][1])
     added_polarity[word]=polarity/APIcall.rt_paired_freq[word_frq][1]
-#  print('***************')
-#  print(added_polarity)
-#  print('******************')
  tuples=list(zip(preprocessedSearchedTweets,results))
  df = pd.DataFrame(tuples, columns=['Tweet','results'])
-#  print(df)
  for word in APIcall.rt_paired_freq.keys():
-#   print(word)
-#   print(APIcall.rt_paired_freq[word][0])
-#   print(added_polarity[word])
   if APIcall.rt_paired_freq[word][1]>=2:
     if word not in spam_words:
      if APIcall.rt_paired_freq[word][0]>=2:  
@@ -112,7 +103,7 @@ def loadModel(preprocessedSearchedTweets):
            "word_sentiment_positive":word_sentiment_positive,
            "word_sentiment_negative":word_sentiment_negative,
            "timeline":APIcall.timeline}
- print(jsonData)
+ #print(jsonData)
  return jsonData
 
 # def polarityToJson(polarityValues):

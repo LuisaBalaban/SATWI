@@ -34,10 +34,10 @@ class Competitor extends React.Component {
                                     height={'200px'}
                                     chartType="BarChart"
                                     loader={<div>Loading Chart</div>}
-                                    data={[
+                                    data={this.state.word_sentiment_negative_competitor?[
                                         ['Word', 'No.apperances', { role: 'style' }],
                                         ...this.state.word_sentiment_negative_competitor
-                                    ]}
+                                    ]:[]}
                                     options={{
                                         title: 'Most recurrent negative words',
                                         legend: { position: "none" },
@@ -60,10 +60,10 @@ class Competitor extends React.Component {
                                     height={'200px'}
                                     chartType="BarChart"
                                     loader={<div>Loading Chart</div>}
-                                    data={[
+                                    data={this.state.word_sentiment_positive_competitor?[
                                         ['Word', 'No.apperances', { role: 'style' }],
                                         ...this.state.word_sentiment_positive_competitor
-                                    ]}
+                                    ]:[]}
                                     options={{
                                         title: 'Most recurrent positive words',
                                         legend: { position: "none" },
@@ -116,10 +116,10 @@ class Competitor extends React.Component {
                                     chartType="LineChart"
                                     loader={<div>Loading Chart</div>}
 
-                                    data={[
+                                    data={this.state.timelineCompetitor?[
                                         ['date', 'count'],
                                          ...this.state.timelineCompetitor
-                                    ]
+                                    ]:[]
                                     }
 
                                     options={{

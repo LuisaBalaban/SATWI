@@ -5,11 +5,12 @@ import Lottie from '../Lottie.js'
 import board from '../images/config-board.json'
 
 class BoardConfig extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
-            username: '',
+            username: this.props.location.state.username,
             competitor: '',
+            userId: this.props.location.state.userId,
             //project 1
             projectName1: 'Project',
             feature1: '',
@@ -124,7 +125,7 @@ class BoardConfig extends React.Component {
         console.log(this.state.receiveEmails)
 
 
-        fetch("http://127.0.0.1:5000/board", {
+        fetch("http://127.0.0.1:5000/board-config", {
             method: "POST",
             body: JSON.stringify({
                 feature1: this.state.feature1,
@@ -138,7 +139,14 @@ class BoardConfig extends React.Component {
                 date2: this.state.date2,
                 date3: this.state.date3,
                 competitor:this.state.competitor,
-                noProjects:this.state.noProjects
+                noProjects:this.state.noProjects,
+                projectName1:this.state.projectName1,
+                projectName2:this.state.projectName2,
+                projectName3:this.state.projectName3.toString,
+                userId:this.state.userId,
+                ReceiveRecommendations:this.state.personalizedRecommandations,
+                ReceiveEmails:this.state.receiveEmails,
+                ReceiveMonthlyReport:this.state.monthlyReport
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -153,21 +161,26 @@ class BoardConfig extends React.Component {
                 console.log(json)
                 console.log((Object.keys(json)[0]).toString())
                 console.log(json[(Object.keys(json)[0]).toString()])
+                console.log(json[this.state.feature1])
+                console.log(Object.values(json[this.state.feature1].results))
+                console.log(json[this.state.feature1])
+                console.log(Object.values(json[this.state.feature1].results))
+                console.log(json['ids'])
+                console.log(Object.values(json[this.state.feature1].results[2][1]))
+                console.log(Object.values(json[this.state.feature1].labeledTweets))
+                // console.log(this.state.countNeg)
+                // console.log("JSON KEYS")
+                // console.log(json[this.state.feature1])
+                // console.log(json[this.state.trigger1])
+                // console.log(json[Object.keys(json).toString()])
+                // console.log("TESTING")
+                // console.log( json[this.state.trigger2].timeline)
+                // console.log((Object.values(json[this.state.feature1].labeledTweets)))
+                // console.log(Object.keys(json[this.state.feature1].labeledTweets[0]))
+                // console.log(json[this.state.feature1].labeledTweets[0])
+                // console.log(Object.values(json[this.state.feature1].labeledTweets[0]))
 
                 let path = `/board`;
-                console.log(this.state.countNeg)
-                console.log("JSON KEYS")
-                console.log(json[this.state.feature1])
-                console.log(json[this.state.trigger1])
-                console.log(json[Object.keys(json).toString()])
-                console.log("TESTING")
-                console.log( json[this.state.trigger2].timeline)
-                console.log((Object.values(json[this.state.feature1].labeledTweets)))
-                console.log(Object.keys(json[this.state.feature1].labeledTweets[0]))
-                console.log(json[this.state.feature1].labeledTweets[0])
-                console.log(Object.values(json[this.state.feature1].labeledTweets[0]))
-
-
                 this.props.history.push({
                     pathname: path,
                     state: {
@@ -181,10 +194,10 @@ class BoardConfig extends React.Component {
                         countPoz1: (JSON.stringify(Object.values(json[this.state.feature1].labeledTweets)).match(/Positive/g) || []).length,
                         countNeg1: (JSON.stringify(Object.values(json[this.state.feature1].labeledTweets)).match(/Negative/g) || []).length,
                         count_tweets1: json[this.state.feature1].count[1],
-                        polarityValues1: Object.values(json[this.state.feature1].results[0]),
+                        polarityValues1: Object.values(json[this.state.feature1].results[2][1]),
                         max_followers1: json[this.state.feature1].max_followers,
                         all_followers1: json[this.state.feature1].all_followers, most_used_hashtag1: json[this.state.feature1].most_used_hashtag,
-                        tweets1: Object.keys(json[this.state.feature1].labeledTweets[0]),
+                        tweets1: Object.keys(json[this.state.feature1].labeledTweets),
                         bubble_chart_data1: json[this.state.feature1].bubble_chart_data,
                         projectName1: this.state.projectName1,
 
@@ -200,61 +213,66 @@ class BoardConfig extends React.Component {
                         feature2: this.state.feature2,
                         date2: this.state.date2,
                         count_retweets2: ((json[this.state.feature2] ? json[this.state.feature2].count[0] : '')),
-                        countPoz2: ((json[this.state.feature2] ? (JSON.stringify(Object.values(json[this.state.feature2].labeledTweets)).match(/Positive/g) || []).length : '')),
-                        countNeg2: ((json[this.state.feature2] ? (JSON.stringify(Object.values(json[this.state.feature2].labeledTweets)).match(/Negative/g) || []).length : '')),
-                        count_tweets2: ((json[this.state.feature2] ? json[this.state.feature2].count[1] : '')),
-                        polarityValues2: ((json[this.state.feature2] ? Object.values(json[this.state.feature2].results[0]) : '')),
-                        max_followers2: ((json[this.state.feature2] ? json[this.state.feature2].max_followers : '')),
-                        all_followers2: ((json[this.state.feature2] ? json[this.state.feature2].all_followers : "")),
-                        most_used_hashtag2: ((json[this.state.feature2] ? json[this.state.feature2].most_used_hashtag : "")),
-                        tweets2: ((json[this.state.feature2] ? Object.keys(json[this.state.feature2].labeledTweets[0]) : "")),
-                        bubble_chart_data2: ((json[this.state.feature2] ? json[this.state.feature2].bubble_chart_data : "")),
-                        projectName2: ((json[this.state.feature2] ? this.state.projectName2 : "")),
+                        countPoz2: (json[this.state.feature2] ? (JSON.stringify(Object.values(json[this.state.feature2].labeledTweets)).match(/Positive/g) || []).length : ''),
+                        countNeg2: (json[this.state.feature2] ? (JSON.stringify(Object.values(json[this.state.feature2].labeledTweets)).match(/Negative/g) || []).length : ''),
+                        count_tweets2: (json[this.state.feature2] ? json[this.state.feature2].count[1] : ''),
+                        polarityValues2: (json[this.state.feature2] ? Object.values(json[this.state.feature2].results[2][1]) : ''),
+                        max_followers2: (json[this.state.feature2] ? json[this.state.feature2].max_followers : ''),
+                        all_followers2: (json[this.state.feature2] ? json[this.state.feature2].all_followers : ""),
+                        most_used_hashtag2: (json[this.state.feature2] ? json[this.state.feature2].most_used_hashtag : ""),
+                        tweets2: (json[this.state.feature2] ? Object.keys(json[this.state.feature2].labeledTweets[0]) : ""),
+                        bubble_chart_data2: (json[this.state.feature2] ? json[this.state.feature2].bubble_chart_data : ""),
+                        projectName2: (json[this.state.feature2] ? this.state.projectName2 : ""),
                         //project 2 - trigger
                         trigger2:  this.state.trigger2,
-                        avgPolarityTrigger2: ((json[this.state.trigger2] ? json[this.state.trigger2].average : "")),
-                        impactedFollowersTrigger2: ((json[this.state.trigger2] ? json[this.state.trigger2].all_followers : "")),
-                        hashtagTrigger2: ((json[this.state.trigger2] ? json[this.state.trigger2].most_used_hashtag : "")),
-                        mostFollowedTrigger2: ((json[this.state.trigger2] ? json[this.state.trigger2].max_followers : "")),
-                        timeline2: ((json[this.state.trigger2] ? json[this.state.trigger2].timeline : "")),
+                        avgPolarityTrigger2: (json[this.state.trigger2] ? json[this.state.trigger2].average : ""),
+                        impactedFollowersTrigger2: (json[this.state.trigger2] ? json[this.state.trigger2].all_followers : ""),
+                        hashtagTrigger2: (json[this.state.trigger2] ? json[this.state.trigger2].most_used_hashtag : ""),
+                        mostFollowedTrigger2: (json[this.state.trigger2] ? json[this.state.trigger2].max_followers : ""),
+                        timeline2: (json[this.state.trigger2] ? json[this.state.trigger2].timeline : ""),
                         //project 3
                         feature3: this.state.feature3,
                         date2: this.state.date3,
-                        count_retweets3: ((json[this.state.feature3] ? json[this.state.feature3].count[0] : "")),
-                        countPoz3: ((json[this.state.feature3] ? (JSON.stringify(Object.values(json[this.state.feature3].labeledTweets)).match(/Positive/g) || []).length : "")),
-                        countNeg3: ((json[this.state.feature3] ? (JSON.stringify(Object.values(json[this.state.feature3].labeledTweets)).match(/Negative/g) || []).length : "")),
-                        count_tweets3: ((json[this.state.feature3] ? json[this.state.feature3].count[1] : "")),
-                        polarityValues3: ((json[this.state.feature3] ? Object.values(json[this.state.feature3].results[0]) : "")),
-                        max_followers3: ((json[this.state.feature3] ? json[this.state.feature3].max_followers : "")),
-                        all_followers3: ((json[this.state.feature3] ? json[this.state.feature3].all_followers : "")),
-                        most_used_hashtag3: ((json[this.state.feature3] ? json[this.state.feature3].most_used_hashtag : "")),
-                        tweets3: ((json[this.state.feature3] ? Object.keys(json[this.state.feature3].labeledTweets[0]) : "")),
-                        bubble_chart_data3: ((json[this.state.feature3] ? json[this.state.feature3].bubble_chart_data : "")),
+                        count_retweets3: (json[this.state.feature3] ? json[this.state.feature3].count[0] : ""),
+                        countPoz3: (json[this.state.feature3] ? (JSON.stringify(Object.values(json[this.state.feature3].labeledTweets)).match(/Positive/g) || []).length : ""),
+                        countNeg3: (json[this.state.feature3] ? (JSON.stringify(Object.values(json[this.state.feature3].labeledTweets)).match(/Negative/g) || []).length : ""),
+                        count_tweets3: (json[this.state.feature3] ? json[this.state.feature3].count[1] : ""),
+                        polarityValues3: (json[this.state.feature3] ? Object.values(json[this.state.feature3].results[2][1]) : ""),
+                        max_followers3: (json[this.state.feature3] ? json[this.state.feature3].max_followers : ""),
+                        all_followers3: (json[this.state.feature3] ? json[this.state.feature3].all_followers : ""),
+                        most_used_hashtag3: (json[this.state.feature3] ? json[this.state.feature3].most_used_hashtag : ""),
+                        tweets3: (json[this.state.feature3] ? Object.keys(json[this.state.feature3].labeledTweets[0]) : ""),
+                        bubble_chart_data3: (json[this.state.feature3] ? json[this.state.feature3].bubble_chart_data : ""),
                         projectName3: this.state.projectName3,
                         //project 3 - trigger
                         trigger3: this.state.trigger3,
-                        avgPolarityTrigger3: ((json[this.state.trigger3] ? json[this.state.trigger3].average : "")),
-                        impactedFollowersTrigger3: ((json[this.state.trigger3] ? json[this.state.trigger3].all_followers : "")),
-                        hashtagTrigger3: ((json[this.state.trigger3] ? json[this.state.trigger3].most_used_hashtag : "")),
-                        mostFollowedTrigger3: ((json[this.state.trigger3] ? json[this.state.trigger3].max_followers : "")),
-                        timeline3: ((json[this.state.trigger3] ? json[this.state.trigger3].timeline : "")),
+                        avgPolarityTrigger3: (json[this.state.trigger3] ? json[this.state.trigger3].average : ""),
+                        impactedFollowersTrigger3: (json[this.state.trigger3] ? json[this.state.trigger3].all_followers : ""),
+                        hashtagTrigger3: (json[this.state.trigger3] ? json[this.state.trigger3].most_used_hashtag : ""),
+                        mostFollowedTrigger3: (json[this.state.trigger3] ? json[this.state.trigger3].max_followers : ""),
+                        timeline3: (json[this.state.trigger3] ? json[this.state.trigger3].timeline : ""),
 
                         //competitor
-                        word_sentiment_negative_competitor: ((json[this.state.competitor] ? json[this.state.competitor].word_sentiment_negative : "")),
-                        word_sentiment_positive_competitor: ((json[this.state.competitor] ? json[this.state.competitor].word_sentiment_positive : "")),
-                        timelineCompetitor: ((json[this.state.competitor] ? json[this.state.competitor].timeline : "")),
-                        countNegCompetitor: ((json[this.state.competitor] ? (JSON.stringify(Object.values(json[this.state.competitor].labeledTweets)).match(/Negative/g) || []).length : "")),
-                        countPozCompetitor:  ((json[this.state.competitor] ? (JSON.stringify(Object.values(json[this.state.competitor].labeledTweets)).match(/Positive/g) || []).length : "")),
+                        word_sentiment_negative_competitor: json[this.state.competitor] ? json[this.state.competitor].word_sentiment_negative : "",
+                        word_sentiment_positive_competitor: json[this.state.competitor] ? json[this.state.competitor].word_sentiment_positive : "",
+                        timelineCompetitor: json[this.state.competitor] ? json[this.state.competitor].timeline : "",
+                        countNegCompetitor: json[this.state.competitor] ? (JSON.stringify(Object.values(json[this.state.competitor].labeledTweets)).match(/Negative/g) || []).length : "",
+                        countPozCompetitor: json[this.state.competitor] ? (JSON.stringify(Object.values(json[this.state.competitor].labeledTweets)).match(/Positive/g) || []).length : "",
+
+                        //project ids
+                        projId: json['ids'],
+                        projId1:json['ids'][0]?json['ids'][0] : 0,
+                        projId2:json['ids'][1]?json['ids'][1] : 0,
+                        projId3:json['ids'][2]?json['ids'][2] : 0,
                     }
                 });
             })
     };
 
 
-
     render() {
 
-        
+        console.log(this.state.countPoz1)        
         return (<div>
 
             <h1 id="small-title">Personalize your board</h1>

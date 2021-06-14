@@ -38,10 +38,13 @@ def loadModel(preprocessedSearchedTweets):
  label = tf.argmax(tf_predictions, axis=1)
  label = label.numpy()
  labeledTweets={}
+ labeledTweetsDETAILED={}
+ resultsDETAILED=[]
  for i in range(len(preprocessedSearchedTweets)):
   results.append(round(tf_predictions[i][0].numpy().tolist(),2))
+  resultsDETAILED.append(round(tf_predictions[i][0].numpy().tolist(),4))
   labeledTweets[preprocessedSearchedTweets[i]]=labels[label[i]]
-
+  labeledTweetsDETAILED[preprocessedSearchedTweets[i]]=resultsDETAILED[i]
  tuples=list(zip(preprocessedSearchedTweets,results))
  df = pd.DataFrame(tuples, columns=['Tweet','results'])
  polarityvals=df.values.tolist();
@@ -52,6 +55,7 @@ def loadModel(preprocessedSearchedTweets):
      i=i+1
  average=average/i
  jsonData={"labeledTweets":[labeledTweets],
+           'labeledTweetsDETAILED':labeledTweetsDETAILED,
            "results":[polarityvals],
            "count":APIcallBrand.count(),
            "mostRetweeted":str(APIcallBrand.most_retweeted),
@@ -64,5 +68,5 @@ def loadModel(preprocessedSearchedTweets):
            "most_used_hashtag":APIcallBrand.hashtags_text,
            "average":average*100,
            "timeline":APIcallBrand.timeline}
- print(jsonData)
+ #print(jsonData)
  return jsonData

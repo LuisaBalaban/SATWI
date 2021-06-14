@@ -187,19 +187,19 @@ class UserInterface extends React.Component {
    
      <h3 id="title-one">Stats about <i>{this.state.keyword}</i></h3>
    <section>
-     <div className="box">
+     <div  className="box">
          <div className="vertical">
-         <div  className="child">
+         <div id="front" className="childe">
          <img src={twitter_logo} width={80} height={80}/>
          <p>{this.state.total_no_tweets}</p></div>
-         <div  className="child">
+         <div  className="childe">
          <img src={user_logo} width={100} height={100}/>
          <p>{this.state.all_followers}</p></div>      
          </div>
          <div className="vertical">
-         <div  className="child">
+         <div  className="childe">
          <img src={retweet_logo} width={100} height={70}/><p>{this.state.total_no_rtweets}</p></div>
-         <div  className="child">
+         <div  className="childe">
          <img src={hashtag_logo} width={100} height={100}/><p>{this.state.no_hashtags}</p></div>
          </div>
         
@@ -342,10 +342,10 @@ class UserInterface extends React.Component {
                 <section>
  <h3 id="title-one">Features to pay attention to </h3> 
 <div className="vertical">
-<button value={[this.state.word_sentiment_positive[0]][0][0]} onClick={this.performGoogleSerach} class="myButton">{[this.state.word_sentiment_positive[0]][0][0] }</button>
+{/* <button value={[this.state.word_sentiment_positive[0]][0][0]} onClick={this.performGoogleSerach} class="myButton">{[this.state.word_sentiment_positive[0]][0][0] }</button>
 <button value={[this.state.word_sentiment_positive[1]][0][0]} onClick={this.performGoogleSerach}  class="myButton">{[this.state.word_sentiment_positive[1]][0][0] }</button>
 <button value={[this.state.word_sentiment_negative[0]][0][0]} onClick={this.performGoogleSerach} class="myButton">{[this.state.word_sentiment_negative[0]][0][0] }</button>
-<button value={[this.state.word_sentiment_negative[1]][0][0]} onClick={this.performGoogleSerach}  class="myButton">{[this.state.word_sentiment_negative[1]][0][0] }</button>
+<button value={[this.state.word_sentiment_negative[1]][0][0]} onClick={this.performGoogleSerach}  class="myButton">{[this.state.word_sentiment_negative[1]][0][0] }</button> */}
 
 </div>
                 </section>
@@ -356,7 +356,7 @@ class UserInterface extends React.Component {
   chartType="BarChart"
   loader={<div>Loading Chart</div>}
   data={[
-    ['Word', 'No.apperances' ,{ role: 'style' }],
+    ['Word', 'No. of apperances' ,{ role: 'style' }],
    ...this.state.word_sentiment_negative
   ]}
   options={{
@@ -366,7 +366,7 @@ class UserInterface extends React.Component {
     color:'red',
 
     hAxis: {
-      title: 'No appereances',
+      title: 'No. of appereances',
       minValue: 0,
     },
     vAxis: {
@@ -382,7 +382,7 @@ class UserInterface extends React.Component {
   chartType="BarChart"
   loader={<div>Loading Chart</div>}
   data={[
-    ['Word', 'No.apperances' ,{ role: 'style' }],
+    ['Word', 'No. of apperances' ,{ role: 'style' }],
    ...this.state.word_sentiment_positive
   ]}
   options={{
@@ -392,7 +392,7 @@ class UserInterface extends React.Component {
     color:'red',
 
     hAxis: {
-      title: 'No appereances',
+      title: 'No. of appereances',
       minValue: 0,
     },
     vAxis: {
