@@ -29,7 +29,8 @@ retweet_count_list=[]
 followers_count_list=[]
 hashtags_count_list=[]
 timeline=[]
-
+tweetType=[]
+ids=[]
 
    
 def creatingTestSet(searched_keyword):
@@ -49,13 +50,16 @@ def creatingTestSet(searched_keyword):
     most_used_hashtag=0
     for tweet_info in tweepy.Cursor(api.search, q=searched_keyword,rpp=30, lang="en", tweet_mode='extended', type='popular').items(30):
         created_at.append(tweet_info.created_at)
+        ids.append(tweet_info.id)
         if 'retweeted_status' in dir(tweet_info):
             tweet=tweet_info.retweeted_status.full_text
             retweets.append(tweet)
             total_no_retweets+=1
+            tweetType.append("retweet")
         else: 
             tweet=tweet_info.full_text
             tweets.append(tweet)
+            tweetType.append("text")
         if tweet_info.retweet_count > rt_count:
                  rt_count=tweet_info.retweet_count
                  most_retweeted=tweet_info.id
@@ -83,7 +87,7 @@ def creatingTestSet(searched_keyword):
     dataframe_Timeline= dataframe_Timeline.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
     timeline=dataframe_Timeline.to_numpy()
     timeline=timeline.tolist()
-  
+    
     print(max_faved)
     print('-------------------------------')
     print('-------------------------------')

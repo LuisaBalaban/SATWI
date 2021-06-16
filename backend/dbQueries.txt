@@ -99,3 +99,10 @@ CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 
 ALTER TABLE FeaturesTweets
 ADD DetailedScore FLOAT;
+
+ALTER TABLE FeaturesTweets
+ADD TweetId BIGINT NOT NULL;
+
+ALTER TABLE FeaturesTweets
+ADD TweetType VARCHAR (20);
+DELETE FROM FeaturesTweets;

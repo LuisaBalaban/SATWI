@@ -128,41 +128,60 @@ class Board extends React.Component {
                 
 
                 console.log(json)
-                const length1 = json.body[this.state.projId1].length;
-                console.log(length1)
-                var j=0;
-                var k=0;
-                for(var i=0;i<length1;i++)
-                {
-                    if(json.body[this.state.projId1][i][10]===1)
-                    {
-                        this.state.triggerTweets[j]=json.body[this.state.projId1][i];
+                // const length1 = json.body[this.state.projId1].length;
+                // console.log(length1)
+                // var j=0;
+                // var k=0;
+                // for(var i=0;i<length1;i++)
+                // {
+                //     if(json.body[this.state.projId1][i][10]===1)
+                //     {
+                //         this.state.triggerTweets[j]=json.body[this.state.projId1][i];
                         
-                        j=j+1;
-                    }
-                    else{
+                //         j=j+1;
+                //     }
+                //     else{
                         
-                        this.state.featureTweets[k]=json.body[this.state.projId1][i];
-                        if(this.state.featureTweets[k][4]===0)
-                        {
-                            this.setState({countPoz1:this.state.countPoz1+1})
-                        }
-                        else{
-                            this.setState({countNeg1:this.state.countNeg1+1})
-                        }
-                        var polarityValues=[]
-                        polarityValues[k]=Object.freeze({tweet:this.state.featureTweets[k][2], value:this.state.featureTweets[k][11]})
-                        this.setState({
-                            polarityValues1:this.state.polarityValues1+polarityValues[k]
-                        })
-                        k=k+1;
-                    }
-                }
+                //         this.state.featureTweets[k]=json.body[this.state.projId1][i];
+                //         if(this.state.featureTweets[k][4]===0)
+                //         {
+                //             this.setState({countPoz1:this.state.countPoz1+1})
+                //         }
+                //         else{
+                //             this.setState({countNeg1:this.state.countNeg1+1})
+                //         }
+                //         var polarityValues=[]
+                //         polarityValues[k]=Object.freeze({tweet:this.state.featureTweets[k][2], value:this.state.featureTweets[k][11]})
+                //         this.setState({
+                //             polarityValues1:this.state.polarityValues1+polarityValues[k]
+                //         })
+                //         k=k+1;
+                //     }
+                //}
+                this.setState({
+                    avgPolarityTrigger1:json.body[this.state.projId1].averageTriggerPolarity,
+                    bubble_chart_data1:json.body[this.state.projId1].bubble_chart_data,
+                    all_followers1:json.body[this.state.projId1].allFollowersFeature,
+                    polarityValues1:json.body[this.state.projId1].polarityVals,
+                    word_sentiment_negative_competitor:json.body[this.state.projId1].word_sentiment_negative,
+                    word_sentiment_positive_competitor:json.body[this.state.projId1].word_sentiment_positive,
+                    countPoz1:json.body[this.state.projId1].countPoz,
+                    countNeg1:json.body[this.state.projId1].countNeg,
+                    count_retweets1:(JSON.stringify(json.body[this.state.projId1].tweetType).match(/retweet/g) || []).length,
+                    count_tweets1:(JSON.stringify(json.body[this.state.projId1].tweetType).match(/text/g) || []).length,
+                    impactedFollowersTrigger1:json.body[this.state.projId1].allFollowersTrigger,
+                    max_followers1:(json.body[this.state.projId1].mostPopularUserTrigger).toString(),
+                    mostRetweetedTrigger1:(json.body[this.state.projId1].mostRetweetedTweetFeature).toString(),
+                    timeline1:json.body[this.state.projId1].timeline,
+                    trigger1:json.body[this.state.projId1].triggerFeature
+
+
+                })
                 console.log(this.state.featureTweets)
                 console.log(this.state.triggerTweets)
                 console.log(this.state.countNeg1)
                 console.log(this.state.countPoz1)
-                console.log(this.state.polarityValues1)
+                console.log(this.state.max_followers1) 
 
             })
     }

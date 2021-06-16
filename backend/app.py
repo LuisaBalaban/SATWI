@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template
 import json 
+import string
 import time
 from threading import Thread
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
@@ -25,6 +26,10 @@ thread = None
 app = Flask(__name__, template_folder="components")
 app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app)
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] =  'pass'
+app.config['MYSQL_DB'] = 'satwidb'
 mysql=MySQL(app)
 async_mode = None
 
@@ -274,7 +279,10 @@ def board():
   cursor1.execute( "INSERT INTO Boards (BoardId, ProvidedUserId, Competitor, TwitterHandle, ReceiveRecommendations,ReceiveEmails,ReceiveMonthlyReport) VALUES  (%s,%s,%s,%s,%s,%s,%s)", valuesUserBoard)
   conn1.commit()
  #   import MySQLdb
-
+#   host = "localhost"
+#   passwd = "pass"
+#   user = "root"
+#   dbname = "satwidb"
 #   db = MySQLdb.connect(host=host, user=user, passwd=passwd, db=dbname)
 #   cursor2 = db.cursor()
 #   cursor2.execute("ALTER DATABASE `%s` CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci'" % dbname)
@@ -294,8 +302,8 @@ def board():
      conn.commit()
      jsonfeatures[feature]=ComputingData.extractingDataForFeatures(username,feature,dates[i],jsonfeatures)
      for tweet in dict(jsonfeatures[feature]['labeledTweets']).keys():
-         valuesTweet=(projectIds[i], feature, tweet.encode('unicode_escape'), dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet), dict(jsonfeatures[feature]['labeledTweets']).get(tweet),dict(jsonfeatures[feature]['results']).get(tweet),APIcallDB.retweet_count_list[i], APIcallDB.followers_count_list[i],APIcallDB.hashtags_count_list[i],APIcallDB.created_at[i], False)
-         cursor.execute( "insert into FeaturesTweets (ProjectID, Feature, Tweet, DetailedScore, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, TriggerState) values (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s)", valuesTweet)
+         valuesTweet=(projectIds[i], feature, tweet.encode('unicode_escape'), dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet), dict(jsonfeatures[feature]['labeledTweets']).get(tweet),round(dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet),2),APIcallDB.retweet_count_list[i], APIcallDB.followers_count_list[i],APIcallDB.hashtags_count_list[i],APIcallDB.created_at[i], False,  APIcallDB.ids[i], APIcallDB.tweetType[i])
+         cursor.execute( "insert into FeaturesTweets (ProjectID, Feature, Tweet, DetailedScore, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, TriggerState, TweetId, TweetType) values (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s,%s, %s)", valuesTweet)
          conn.commit()
      i=i+1
   for trigger in triggers:
@@ -303,8 +311,8 @@ def board():
      i=0;
      j=0
      for tweet in jsonfeatures[trigger]['labeledTweets'][0].keys():
-         valuesTweet=(projectIds[i], dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet), feature, tweet.encode('unicode_escape'), dict(jsonfeatures[trigger]['labeledTweets'][0]).get(tweet),dict(jsonfeatures[trigger]['results'][0]).get(tweet),APIcallDB.retweet_count_list[i], APIcallDB.followers_count_list[i],APIcallDB.hashtags_count_list[i],APIcallDB.created_at[i], True)
-         cursor.execute( "insert into FeaturesTweets (ProjectID, DetailedScore, Feature, Tweet, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, TriggerState) values (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s)", valuesTweet)
+         valuesTweet=(projectIds[i], dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet), feature, tweet.encode('unicode_escape'), dict(jsonfeatures[trigger]['labeledTweets'][0]).get(tweet),dict(jsonfeatures[trigger]['results'][0]).get(tweet),APIcallDB.retweet_count_list[i], APIcallDB.followers_count_list[i],APIcallDB.hashtags_count_list[i],APIcallDB.created_at[i], True, APIcallDB.ids[i],APIcallDB.tweetType[i])
+         cursor.execute( "insert into FeaturesTweets (ProjectID, DetailedScore, Feature, Tweet, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, TriggerState,TweetId, TweetType) values (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s,%s, %s)", valuesTweet)
          conn.commit()
          j=j+1
      i=i+1
@@ -320,6 +328,7 @@ def board():
 @app.route('/boardStats', methods = ['POST'])
 @cross_origin()
 def boardStats():
+  results={}
   noProjects=request.json['noProjects']
   projectIds=[]
   if noProjects >= 1:
@@ -335,39 +344,97 @@ def boardStats():
   cursor = conn.cursor()
   info={}
   for projectId in projectIds:
-   cursor.execute( "SELECT * FROM FeaturesTweets WHERE ProjectId LIKE %s",[projectId])
-   conn.commit()
-   data = list(cursor.fetchall())
-   print(data)
-   info[projectId]=data
+    cursor.execute( "SELECT * FROM FeaturesTweets WHERE ProjectId LIKE %s",[projectId])
+    conn.commit()
+    data = list(cursor.fetchall())
+    print(data)
+    info[projectId]=data
+    print("&^^&^&^&^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print(info)
   # length = len(info)
-   triggerTweets=[]
-   featureTweets=[]
-   polarityVals=[]
-   countPoz=0;
-   countPozTrigger=0;
-   countNegTrigger=0;
-   countNeg=0;
-   for tweet in info[projectId]:
-     print("&&&&&&&&&&&&&&&")
-     print(tweet)
-     if tweet[10]==1:
-       triggerTweets.append(tweet)
-       if tweet[4]==0:
-         countPozTrigger+=1
-       else:
-         countNegTrigger+=1;
-       polarityVals.append([tweet[2], tweet[11]])
-     else:
-       featureTweets.append(tweet)
-       if tweet[4]==0:
-         countPoz+=1
-       else:
-         countNeg+=1;
-       polarityVals.append([tweet[2], tweet[11]])
-  print(polarityVals)
-  print(info)
-  return jsonify({"body": info}), 200
+    tweetScore={}
+    triggerTweets=[]
+    featureTweets=[]
+    polarityVals=[]
+    triggerData=[]
+    featureTweets=[]
+    countPoz=0
+    allFollowersTrigger=0
+    countNeg=0
+    hashtagsTrigger=''
+    retweetCount={}
+    timeline=[]
+    averageTriggerPolarity=0
+    mostPopularUserTrigger=0
+    mostRetweetedTweetFeature=0
+    maxRet=0
+    maxFollowers=0
+    tweetType=[]
+    for tweet in info[projectId]:
+      print("&&&&&&&&&&&&&&&")
+      print(tweet)
+      if tweet[10]==1:
+        triggerTweets.append(tweet[2])
+        polarityVals.append([tweet[2], tweet[11]])
+        allFollowersTrigger+=tweet[6]
+        timeline.append(tweet[8])
+        print(tweet[7])
+        hashtagsTrigger=hashtagsTrigger+tweet[7][0]
+        averageTriggerPolarity=averageTriggerPolarity+tweet[4]
+        if(maxFollowers<tweet[6]):
+          mostPopularUserTrigger=tweet[12]
+          maxFollowers=tweet[6]
+      else:
+        featureTweets.append(tweet[2])
+        tweetScore[tweet[2]]=tweet[11]
+        print("****************")
+        print(tweet[4])
+        if tweet[4]==0:
+          countPoz+=1
+        if tweet[4]==1:
+          countNeg+=1;
+        polarityVals.append([tweet[2], tweet[11]])
+        retweetCount[tweet[2]]=tweet[5]
+        if(maxRet<tweet[5]):
+          mostRetweetedTweetFeature=tweet[12]
+          maxRet=tweet[5]
+        tweetType.append(tweet[13])
+    cursor.execute( "SELECT TriggerFeature, ProjectName, Feature from Projects WHERE ProjectId LIKE %s",[projectId])
+    conn.commit()
+    projectInfo = list(cursor.fetchall())
+    print(projectInfo)
+    allTweets=ComputingData.createTweetsList(featureTweets)
+    wordlist=allTweets.split()
+    rt_paired_freq=ComputingData.pairRetCountWithWords(wordlist, retweetCount)
+    word_pairings = ComputingData.pairingWordsWithRetCountAndPolarity(tweetScore,rt_paired_freq)
+    averageTriggerPolarity=averageTriggerPolarity/len(triggerTweets)*100;
+    results[projectId]={
+      'polarityVals':polarityVals,
+      'triggerFeature':projectInfo[0][0],
+      'feature':projectInfo[0][2],
+      'projectName':projectInfo[0][1],
+      'countPoz':countPoz,
+      'tweetType':tweetType,
+      'countNeg':countNeg,
+      'averageTriggerPolarity':averageTriggerPolarity,
+      'hashtagsTrigger':hashtagsTrigger,
+      'timeline':[timeline],
+      'allFollowersTrigger':allFollowersTrigger,
+      'word_pairings':word_pairings,
+      'rt_paired_freq':rt_paired_freq, 
+      'word_sentiment_positive':word_pairings['word_sentiment_positive'],
+      "word_sentiment_negative":word_pairings['word_sentiment_negative'],
+      "polarity":word_pairings['added_polarity'],
+      "bubble_chart_data":word_pairings['bubble_chart_data'],
+      # "rts":[item[0] for item in rt_paired_freq.values()],
+      # "freq":[item[1] for item in rt_paired_freq.values()],
+      # "words": rt_paired_freq,
+      "mostRetweetedTweetFeature":str(mostRetweetedTweetFeature),
+      'mostPopularUserTrigger':str(mostPopularUserTrigger)
+      }
+  #print(results)
+  #print(info)
+  return jsonify({"body": results}), 200
 
 l = StdOutListener()
 if __name__ == '__main__':

@@ -15,8 +15,8 @@ def extractingDataForFeatures(username,feature,date,jsonfeatures):
     labeledTweets1=SADB.loadModel(preprocessedSearchedTweets1)
     jsonfeatures[feature]=computeDataForFeature(labeledTweets1)
     print("Printing feature data")
-    print(jsonfeatures[feature])
-    print(APIcallDB.max_faved)
+    #print(jsonfeatures[feature])
+    #print(APIcallDB.max_faved)
     return jsonfeatures[feature]
 
 def extractingDataForTriggers(username,trigger,jsonfeatures):
@@ -30,45 +30,57 @@ def extractingDataForTriggers(username,trigger,jsonfeatures):
 
 def computeDataForFeature(labeledTweets):
    max_faved=APIcallDB.max_faved
-   added_polarity={};
    rt_paired_freq={}
-   bubble_chart_data=[];
-   word_sentiment_negative=[]
-   word_sentiment_positive=[]
    allTweets=''
-   for tweet in labeledTweets['labeledTweetsDETAILED'].keys():
-        allTweets+=tweet
+   tweets = labeledTweets['labeledTweetsDETAILED']
+   allTweets=createTweetsList(tweets.keys())
    wordlist=allTweets.split()
-   wordfreq=[]
-   for w in wordlist:
-      wordfreq.append(wordlist.count(w))
-      wordPairs=str(list(zip(wordlist, wordfreq))) 
-   freqdict=APIcall.wordListToFreqDict(wordlist)
-   sorteddict=APIcall.sortFreqDict(freqdict)
-   for value in APIcallDB.tweets_rt_count.keys():
-    totalRTS=0
-    words=value.split()
-    for word in words:
-      for word_rt in sorteddict:
-        word_freq=word_rt[1]
-        if word==word_freq:
-         totalRTS+=APIcallDB.tweets_rt_count[value]
-         rt_paired_freq[word]=[totalRTS,word_rt[0]]
-  # print("printing word list")
-  # print(wordlist)
-   for tweet in labeledTweets['labeledTweetsDETAILED'].keys():
+   wordPairs=createWordsListFromTweets(wordlist,allTweets)
+   rt_paired_freq=pairRetCountWithWords(wordlist, APIcallDB.tweets_rt_count)
+   word_pairings = pairingWordsWithRetCountAndPolarity(tweets,rt_paired_freq)
+   df = pd.DataFrame(labeledTweets.items(), columns=['Tweet','results'])
+   polarityvals=df.values.tolist();
+   data={'labeledTweets':labeledTweets['labeledTweets'],
+         'labeledTweetsDETAILED':labeledTweets['labeledTweetsDETAILED'],
+         'score':labeledTweets['scores'],
+          'results':polarityvals,
+          "count":APIcallDB.count(),
+          "mostRetweeted":str(APIcallDB.most_retweeted),
+          "rts":[item[0] for item in rt_paired_freq.values()],
+           "freq":[item[1] for item in rt_paired_freq.values()],
+           "words": rt_paired_freq,
+           "max_followers":str(max_faved),
+           "total_no_rtweets":APIcallDB.total_no_retweets,
+           "total_no_tweets":30,
+           "no_hashtags":len(APIcallDB.hashtags_pairing_id.keys()),
+           "all_followers":APIcallDB.all_followers,
+           "most_used_hashtag":str(APIcallDB.most_used_hashtag),
+           'word_sentiment_positive':word_pairings['word_sentiment_positive'],
+           "word_sentiment_negative":word_pairings['word_sentiment_negative'],
+           "polarity":word_pairings['added_polarity'],
+           "bubble_chart_data":word_pairings['bubble_chart_data'],
+   }
+   return data
+
+
+def pairingWordsWithRetCountAndPolarity(tweets,rt_paired_freq):
+  word_sentiment_negative=[]
+  word_sentiment_positive=[]
+  bubble_chart_data=[];
+  added_polarity={};
+  for tweet in tweets:
        words=tweet.split()
        for word in words:
             polarity=0
             for word_frq in rt_paired_freq.keys():
                 if word.lower()==word_frq.lower():
-                 polarity=labeledTweets['labeledTweetsDETAILED'][tweet]
+                 polarity=tweets[tweet]
                  if word_frq in added_polarity:
                     added_polarity[word]=polarity+added_polarity[word_frq]
                  else:
                     added_polarity[word]=polarity
             added_polarity[word]=polarity/rt_paired_freq[word_frq][1]
-   for word in rt_paired_freq.keys():
+  for word in rt_paired_freq.keys():
        if rt_paired_freq[word][1]>=2:
             # if word not in spam_words:
                 if rt_paired_freq[word][0]>=2:
@@ -77,23 +89,38 @@ def computeDataForFeature(labeledTweets):
                      word_sentiment_positive.append([word,rt_paired_freq[word][1],'stroke-color: #703593; opacity:0.7; fill-color: #703593'])
                 else:
                      word_sentiment_negative.append([word,rt_paired_freq[word][1],'stroke-color: #703593; opacity:0.7; fill-color: #703593'])
-   df = pd.DataFrame(labeledTweets.items(), columns=['Tweet','results'])
-   polarityvals=df.values.tolist();
-   data={'labeledTweets':labeledTweets['labeledTweets'],
-         'labeledTweetsDETAILED':labeledTweets['labeledTweetsDETAILED'],
-          'results':polarityvals,
-          "count":APIcallDB.count(),
-          "mostRetweeted":str(APIcallDB.most_retweeted),
-          "rts":[item[0] for item in rt_paired_freq.values()],
-           "freq":[item[1] for item in rt_paired_freq.values()],
-           "words": rt_paired_freq,
-           "polarity":added_polarity,"bubble_chart_data":bubble_chart_data,
-           "max_followers":str(max_faved),
-           "total_no_rtweets":APIcallDB.total_no_retweets,
-           "total_no_tweets":30,
-           "no_hashtags":len(APIcallDB.hashtags_pairing_id.keys()),
-           "all_followers":APIcallDB.all_followers,
-           "most_used_hashtag":str(APIcallDB.most_used_hashtag),
-           "word_sentiment_positive":word_sentiment_positive,
-           "word_sentiment_negative":word_sentiment_negative}
-   return data
+  word_pairings={'word_sentiment_negative':word_sentiment_negative,
+    'word_sentiment_positive':word_sentiment_positive,
+    'bubble_chart_data':bubble_chart_data,
+    'added_polarity':added_polarity}
+  return word_pairings
+
+def pairRetCountWithWords(wordlist,rt_count):
+    freqdict={}
+    sorteddict=[]
+    rt_paired_freq={}
+    freqdict=APIcall.wordListToFreqDict(wordlist)
+    sorteddict=APIcall.sortFreqDict(freqdict)
+    for value in rt_count:
+     totalRTS=0
+     words=value.split()
+     for word in words:
+       for word_rt in sorteddict:
+         word_freq=word_rt[1]
+         if word==word_freq:
+           totalRTS=totalRTS+int(rt_count[value])
+           rt_paired_freq[word]=[totalRTS,word_rt[0]]
+    return rt_paired_freq
+    
+def createTweetsList(tweets):
+    allTweets=''
+    for tweet in tweets:
+        allTweets+=tweet
+    return allTweets
+
+def createWordsListFromTweets(wordlist,allTweets):
+   wordfreq=[]
+   for w in wordlist:
+      wordfreq.append(wordlist.count(w))
+      wordPairs=str(list(zip(wordlist, wordfreq)))
+   return wordPairs 

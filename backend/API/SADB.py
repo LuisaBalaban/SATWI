@@ -38,13 +38,14 @@ def loadModel(preprocessedSearchedTweets):
     tuples=list(zip(preprocessedSearchedTweets,results))
     df = pd.DataFrame(tuples, columns=['Tweet','results'])
     polarityvals=df.values.tolist();
-    # print("----------------")
-    # print(labeledTweets)
+    print("---*-*-*-*-*-*-*-----")
+    print(labeledTweets)
     # print("------------------------------------")
     # print(labeledTweetsDETAILED)
     # print("****************************************")
     # print(labels)
     data={'labeledTweetsDETAILED':labeledTweetsDETAILED,
          'labeledTweets':labeledTweets,
-         "results":polarityvals}
+         "results":polarityvals,
+         'scores':results}
     return data
