@@ -86,7 +86,10 @@ def loadModel(preprocessedSearchedTweets):
 #  print(APIcall.max_faved)
  polarityvals=df.values.tolist();
  jsonData={"labeledTweets":[labeledTweets],
+           "labeledTweetsDETAILED":labeledTweetsDETAILED,
            "results":[polarityvals],
+           "retweet_count_list":APIcall.retweet_count_list,
+           "scores":results,
            "count":APIcall.count(),
            "mostRetweeted":str(APIcall.most_retweeted),
            "rts":[item[0] for item in APIcall.rt_paired_freq.values()],
@@ -102,7 +105,7 @@ def loadModel(preprocessedSearchedTweets):
            "most_used_hashtag":str(APIcall.most_used_hashtag),
            "word_sentiment_positive":word_sentiment_positive,
            "word_sentiment_negative":word_sentiment_negative,
-           "timeline":APIcall.timeline}
+           "timeline":APIcall.timelineTimestamps}
  #print(jsonData)
  return jsonData
 

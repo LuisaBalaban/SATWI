@@ -9,16 +9,27 @@ class Competitor extends React.Component {
         super(props);
         this.state = {
             competitor: this.props.location.state.competitor,
-            word_sentiment_negative_competitor: this.props.location.state.word_sentiment_negative_competitor,
-            word_sentiment_positive_competitor: this.props.location.state.word_sentiment_positive_competitor,
-            countPozCompetitor: this.props.location.state.countPozCompetitor,
-            countNegCompetitor: this.props.location.state.countNegCompetitor,
-            timelineCompetitor:this.props.location.state.timelineCompetitor,
+            word_sentiment_negative_competitor: this.props.location.state.word_sentiment_negative_competitor ? this.props.location.state.word_sentiment_negative_competitor : [],
+            word_sentiment_positive_competitor: this.props.location.state.word_sentiment_positive_competitor ?this.props.location.state.word_sentiment_positive_competitor :[],
+            countPozCompetitor: this.props.location.state.countPozCompetitor ?  this.props.location.state.countPozCompetitor: 0,
+            countNegCompetitor: this.props.location.state.countNegCompetitor?  this.props.location.state.countNegCompetitor: 0,
+            timelineCompetitor: this.props.location.state.timelineCompetitor?  this.props.location.state.timelineCompetitor: [],
 
         }
     }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({timelineCompetitor: nextProps.timelineCompetitor,
+        countNegCompetitor:nextProps.countNegCompetitor,
+         countPozCompetitor:nextProps.countPozCompetitor,
+        word_sentiment_negative_competitor:nextProps.word_sentiment_negative_competitor,
+        word_sentiment_positive_competitor:nextProps.word_sentiment_positive_competitor,
+})
+      }
+    
     render() {
         console.log(this.state.countPozCompetitor)
+        console.log(this.state.word_sentiment_negative_competitor)
         return (
             <div className="vertical">
 

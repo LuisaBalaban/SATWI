@@ -9,22 +9,19 @@ import pandas as pd
 
 def extractingDataForFeatures(username,feature,date,jsonfeatures):
     query1=feature+' '+username+' since:'+date
-    print(query1)
     set1=APIcallDB.creatingTestSet(query1)
     preprocessedSearchedTweets1=Preprocess.processTweets(set1)
     labeledTweets1=SADB.loadModel(preprocessedSearchedTweets1)
     jsonfeatures[feature]=computeDataForFeature(labeledTweets1)
-    print("Printing feature data")
-    #print(jsonfeatures[feature])
-    #print(APIcallDB.max_faved)
     return jsonfeatures[feature]
 
 def extractingDataForTriggers(username,trigger,jsonfeatures):
     query2=trigger+' '+username
-    set2=APIcallBrand.creatingTestSet(query2)
+    set2=APIcallDB.creatingTestSet(query2)
     preprocessedSearchedTweets2=Preprocess.processTweets(set2)
-    labeledTweets2=SAtriggers.loadModel(preprocessedSearchedTweets2)
+    labeledTweets2=SADB.loadModel(preprocessedSearchedTweets2)
     jsonfeatures[trigger]=labeledTweets2
+    jsonfeatures[trigger]=computeDataForFeature(labeledTweets2)
     #print("Printing trigger data")
     return jsonfeatures[trigger]
 
@@ -52,6 +49,7 @@ def computeDataForFeature(labeledTweets):
            "max_followers":str(max_faved),
            "total_no_rtweets":APIcallDB.total_no_retweets,
            "total_no_tweets":30,
+           "timeline":APIcallDB.timelineTimestamps,
            "no_hashtags":len(APIcallDB.hashtags_pairing_id.keys()),
            "all_followers":APIcallDB.all_followers,
            "most_used_hashtag":str(APIcallDB.most_used_hashtag),

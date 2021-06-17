@@ -31,7 +31,8 @@ hashtags_count_list=[]
 timeline=[]
 tweetType=[]
 ids=[]
-
+timelineRepeatedList=[]
+timelineTimestamps=[]
    
 def creatingTestSet(searched_keyword):
     global most_retweeted
@@ -83,18 +84,18 @@ def creatingTestSet(searched_keyword):
     if list(hashtags_freq):  
      most_used_hashtag=hashtags_pairing_id[list(hashtags_freq)[0]]
     dataframe_Timeline=pd.DataFrame(created_at, columns=['date'])
+    timelineRepeatedList=dataframe_Timeline.reset_index();
+    timelineRepeatedList=timelineRepeatedList.to_numpy()
+    timelineRepeatedList=timelineRepeatedList.tolist()
+    for i in range(len(timelineRepeatedList)):
+        timelineRepeatedList[i]=timelineRepeatedList[i][1]    
     dataframe_Timeline['day/month/year/hh'] = dataframe_Timeline['date'].apply(lambda x: "%d-%d-%d %d" % (x.month, x.day, x.year, x.hour))
+    print("*********************************")
+    print(timelineRepeatedList)
+    timelineTimestamps.append(timelineRepeatedList)
     dataframe_Timeline= dataframe_Timeline.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
     timeline=dataframe_Timeline.to_numpy()
     timeline=timeline.tolist()
-    
-    print(max_faved)
-    print('-------------------------------')
-    print('-------------------------------')
-    print(len(retweet_count_list))
-    print(len(followers_count_list))
-    print(len(hashtags_count_list))
-    print(len(created_at))
     return [tweet for tweet in result]
 
 def count():

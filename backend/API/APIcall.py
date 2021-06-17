@@ -38,11 +38,14 @@ max_fav_count=0
 total_no_tweets=0
 hashtags=[]
 all_followers=0
+retweet_count_list=[]
 hashtags_text=[]
 hashtags_pairing_id={}
 hashtags_freq={}
 most_used_hashtag=0
 created_at=[]
+timelineRepeatedList=[]
+timelineTimestamps=[]
 def creatingTestSet(searched_keyword):
    
    global tweets_rt
@@ -84,8 +87,10 @@ def creatingTestSet(searched_keyword):
    total_no_rtweets=0
    hashtags_pairing_id={}
    created_at=[]
+
    for tweet_info in tweepy.Cursor(api.search, q=searched_keyword,rpp=50, lang="en", tweet_mode='extended', type='popular').items(50):
      created_at.append(tweet_info.created_at)
+     retweet_count_list.append(tweet_info.retweet_count)
      if 'retweeted_status' in dir(tweet_info):
                tweet=tweet_info.retweeted_status.full_text
                retweets.append(tweet)
@@ -139,8 +144,15 @@ def creatingTestSet(searched_keyword):
         if word==word_freq:
          totalRTS+=tweets_rt[value]
          rt_paired_freq[word]=[totalRTS,word_rt[0]]
+   
    dataframe_Timeline=pd.DataFrame(created_at, columns=['date'])
+   timelineRepeatedList=dataframe_Timeline.reset_index();
+   timelineRepeatedList=timelineRepeatedList.to_numpy()
+   timelineRepeatedList=timelineRepeatedList.tolist()
+   for i in range(len(timelineRepeatedList)):
+      timelineRepeatedList[i]=timelineRepeatedList[i][1]   
    dataframe_Timeline['day/month/year/hh'] = dataframe_Timeline['date'].apply(lambda x: "%d-%d-%d %d" % (x.month, x.day, x.year, x.hour))
+   timelineTimestamps.append(timelineRepeatedList)
    dataframe_Timeline= dataframe_Timeline.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
    timeline=dataframe_Timeline.to_numpy()
    timeline=timeline.tolist()

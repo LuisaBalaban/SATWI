@@ -14,8 +14,6 @@ import json
 from nltk.corpus import stopwords
 
 def loadModel(preprocessedSearchedTweets):
-    print("*************************************************")
-    print(preprocessedSearchedTweets)
     resultsDETAILED=[]
     results=[]
     labeledTweets=[]
@@ -32,18 +30,10 @@ def loadModel(preprocessedSearchedTweets):
         resultsDETAILED.append(round(tf_predictions[i][0].numpy().tolist(),4))
         results.append(round(tf_predictions[i][0].numpy().tolist(),2))
         labeledTweets.append([preprocessedSearchedTweets[i],labels[label[i]]])
-        # print("-----*-*-**---------------------")
-        # print(labels[label[i]])
         labeledTweetsDETAILED[preprocessedSearchedTweets[i]]=resultsDETAILED[i]
     tuples=list(zip(preprocessedSearchedTweets,results))
     df = pd.DataFrame(tuples, columns=['Tweet','results'])
     polarityvals=df.values.tolist();
-    print("---*-*-*-*-*-*-*-----")
-    print(labeledTweets)
-    # print("------------------------------------")
-    # print(labeledTweetsDETAILED)
-    # print("****************************************")
-    # print(labels)
     data={'labeledTweetsDETAILED':labeledTweetsDETAILED,
          'labeledTweets':labeledTweets,
          "results":polarityvals,

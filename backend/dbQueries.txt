@@ -76,9 +76,12 @@ CREATE TABLE FeaturesTweets (
     RetweetCount INT,
     Followers INT,
     Hashtags VARCHAR(100),
-    CreatedAt DATETIME,
+    CreatedAt VARCHAR (100),
     Displayed BOOLEAN,
     TriggerState BOOLEAN,
+    DetailedScore FLOAT,
+    TweetId BIGINT,
+    TweetType varchar(20),
     FOREIGN KEY (ProjectID) REFERENCES Projects(ProjectID)
 );
 
