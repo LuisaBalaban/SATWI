@@ -94,67 +94,6 @@ def result():
   labeledTweets=jsonify(labeledTweets)
   return labeledTweets
 
-# @app.route('/board2', methods = ['POST'])
-# @cross_origin()
-# def brand():
-#   features=[]
-#   triggers=[]
-#   dates=[]
-#   noProjects=request.json['noProjects']
-#   if noProjects >= 1:
-#    feature1 = request.json['feature1']
-#    trigger1 = request.json['trigger1']
-#    date1 = request.json['date1']
-#    date1 = request.json['date1']
-#    features.append(feature1)
-#    triggers.append(trigger1)
-#    dates=[date1]
-#    if noProjects >= 2:
-#     feature2 = request.json['feature2']
-#     trigger2 = request.json['trigger2']
-#     date2 = request.json['date2']
-#     features.append(feature2)
-#     triggers.append(trigger2)
-#     dates.append(date2)
-#     if noProjects==3:
-#       feature3=request.json['feature3']
-#       trigger3=request.json['trigger3']
-#       date3 = request.json['date3']
-#       features.append(feature3)
-#       triggers.append(trigger3)
-#       dates.append(date3)
-#   username = request.json['username']
-#   competitor=request.json['competitor']
-#   print(features)
-#   print(dates)
-#   print(triggers)
-#   jsonfeatures={}
-#   i=0
-#   for feature in features:
-#     query1=feature+' '+username+' since:'+dates[i]
-#     print(query1)
-#     set1=APIcall.creatingTestSet(query1)
-#     preprocessedSearchedTweets1=Preprocess.processTweets(set1)
-#     labeledTweets1=SA.loadModel(preprocessedSearchedTweets1)
-#     jsonfeatures[feature]=labeledTweets1
-#     print(jsonfeatures[feature])
-#     i=i+1;
-#   for trigger in triggers:
-#     query2=trigger+' '+username
-#     set2=APIcallBrand.creatingTestSet(query2)
-#     preprocessedSearchedTweets2=Preprocess.processTweets(set2)
-#     labeledTweets2=SAtriggers.loadModel(preprocessedSearchedTweets2)
-#     jsonfeatures[trigger]=labeledTweets2
-#     print(jsonfeatures[trigger])
-#   set3=APIcall.creatingTestSet(competitor)
-#   preprocessedSearchedTweets3=Preprocess.processTweets(set3)
-#   labeledTweets3=SA.loadModel(preprocessedSearchedTweets3)
-#   jsonfeatures[competitor]=labeledTweets3
-#   print(type(jsonfeatures))
-#   jsonfeatures=jsonify(jsonfeatures)
-#   # print(type(jsonfeatures))
-#   return jsonfeatures
-
 @app.route('/profileBoard', methods = ['POST'])
 @cross_origin()
 def profileBoard():
@@ -280,22 +219,6 @@ def board():
   valuesUserBoard=(BoardId, ProvidedUserId, competitor, username, ReceiveRecommendations, ReceiveEmails, ReceiveMonthlyReport)
   cursor1.execute( "INSERT INTO Boards (BoardId, ProvidedUserId, Competitor, TwitterHandle, ReceiveRecommendations,ReceiveEmails,ReceiveMonthlyReport) VALUES  (%s,%s,%s,%s,%s,%s,%s)", valuesUserBoard)
   conn1.commit()
- #   import MySQLdb
-#   host = "localhost"
-#   passwd = "pass"
-#   user = "root"
-#   dbname = "satwidb"
-#   db = MySQLdb.connect(host=host, user=user, passwd=passwd, db=dbname)
-#   cursor2 = db.cursor()
-#   cursor2.execute("ALTER DATABASE `%s` CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci'" % dbname)
-#   sql = "SELECT DISTINCT(table_name) FROM information_schema.columns WHERE table_schema = '%s'" % dbname
-#   cursor2.execute(sql)
-#   results = cursor2.fetchall()
-#   for row in results:
-#     sql = "ALTER TABLE `%s` convert to character set DEFAULT COLLATE DEFAULT" % (row[0])
-#     cursor2.execute(sql)
-#   db.commit()
-#   db.close()
   conn = mysql.connect
   cursor = conn.cursor()
   for i in range(len(projectIds)):
@@ -305,6 +228,9 @@ def board():
       conn.commit()
       jsonfeatures[feature]=ComputingData.extractingDataForFeatures(username,feature,dates[i],jsonfeatures)
       j=0;
+      print("FEATURES")
+      print(jsonfeatures[feature]['timeline'][0])
+      print(dict(jsonfeatures[feature]['labeledTweets']).keys())
       for tweet in dict(jsonfeatures[feature]['labeledTweets']).keys():
           print(dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet))
           print( dict(jsonfeatures[feature]['labeledTweets']).get(tweet))
@@ -312,17 +238,19 @@ def board():
           valuesTweet=(projectIds[i], feature, tweet.encode('unicode_escape'), dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet), dict(jsonfeatures[feature]['labeledTweets']).get(tweet),round(dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet),2),APIcallDB.retweet_count_list[j], APIcallDB.followers_count_list[i],APIcallDB.hashtags_count_list[i],jsonfeatures[feature]['timeline'][0][j], False,  APIcallDB.ids[j], APIcallDB.tweetType[j])
           cursor.execute( "insert into FeaturesTweets (ProjectID, Feature, Tweet, DetailedScore, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, TriggerState, TweetId, TweetType) values (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s,%s, %s)", valuesTweet)
           conn.commit()
-          j=j+1;
+          j=j+1
   for i in range(len(projectIds)):
       trigger=triggers[i]
       jsonfeatures[trigger]=ComputingData.extractingDataForTriggers(username,trigger,jsonfeatures)
-      k=0;
+      k=0
       x=0
       print("&&&&&&&&&&&&&******************&&&&&&&&")
       print(j)
+      print("TRGGERS")
+      print(dict(jsonfeatures[trigger]['labeledTweets']).keys())
       for tweet in dict(jsonfeatures[trigger]['labeledTweets']).keys():
         if x==j:
-         valuesTweetTrigger=(projectIds[i], dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet), triggers[i], tweet.encode('unicode_escape'), dict(jsonfeatures[trigger]['labeledTweets']).get(tweet),round(dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet),2),APIcallDB.retweet_count_list[j], APIcallDB.followers_count_list[j],APIcallDB.hashtags_count_list[j],jsonfeatures[trigger]['timeline'][0][k], True, APIcallDB.ids[j], APIcallDB.tweetType[j])
+         valuesTweetTrigger=(projectIds[i], dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet), trigger, tweet.encode('unicode_escape'), dict(jsonfeatures[trigger]['labeledTweets']).get(tweet),round(dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet),2),APIcallDB.retweet_count_list[j], APIcallDB.followers_count_list[j],APIcallDB.hashtags_count_list[j],jsonfeatures[trigger]['timeline'][1][k], True, APIcallDB.ids[j], APIcallDB.tweetType[j])
          cursor.execute( "insert into FeaturesTweets (ProjectID, DetailedScore, Feature, Tweet, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, TriggerState,TweetId, TweetType) values (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s,%s, %s)", valuesTweetTrigger)
          conn.commit()
          k=k+1;
@@ -498,8 +426,6 @@ def boardStats():
       "mostRetweetedTweetFeature":str(mostRetweetedTweetFeature),
       'mostPopularUserTrigger':str(mostPopularUserTrigger)
         }
-  #print(results)
-  #print(info)
   return jsonify({"body": results}), 200
 
 l = StdOutListener()

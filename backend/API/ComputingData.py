@@ -10,7 +10,9 @@ import pandas as pd
 def extractingDataForFeatures(username,feature,date,jsonfeatures):
     query1=feature+' '+username+' since:'+date
     set1=APIcallDB.creatingTestSet(query1)
+    print("FEATURE PREPROC SET")
     preprocessedSearchedTweets1=Preprocess.processTweets(set1)
+    print(preprocessedSearchedTweets1)
     labeledTweets1=SADB.loadModel(preprocessedSearchedTweets1)
     jsonfeatures[feature]=computeDataForFeature(labeledTweets1)
     return jsonfeatures[feature]
@@ -87,6 +89,8 @@ def pairingWordsWithRetCountAndPolarity(tweets,rt_paired_freq):
                      word_sentiment_positive.append([word,rt_paired_freq[word][1],'stroke-color: #703593; opacity:0.7; fill-color: #703593'])
                 else:
                      word_sentiment_negative.append([word,rt_paired_freq[word][1],'stroke-color: #703593; opacity:0.7; fill-color: #703593'])
+  print("PRINTING BUBBLE CHrt")
+  print(bubble_chart_data)
   word_pairings={'word_sentiment_negative':word_sentiment_negative,
     'word_sentiment_positive':word_sentiment_positive,
     'bubble_chart_data':bubble_chart_data,

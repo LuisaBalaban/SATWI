@@ -156,7 +156,8 @@ def creatingTestSet(searched_keyword):
    dataframe_Timeline= dataframe_Timeline.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
    timeline=dataframe_Timeline.to_numpy()
    timeline=timeline.tolist()
-   #print(timeline)
+   print("TIMELINE TIMSTAMPS TRIGGERS")
+   print(timeline)
    return [tweet for tweet in res]
 
 def count():

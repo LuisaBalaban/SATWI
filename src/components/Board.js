@@ -91,7 +91,7 @@ class Board extends React.Component {
             word_sentiment_positive_competitor: this.props.location.state.word_sentiment_positive_competitor ? this.props.location.state.word_sentiment_positive_competitor : [],
             countPozCompetitor: this.props.location.state.countPozCompetitor ? this.props.location.state.countPozCompetitor : 0,
             countNegCompetitor: this.props.location.state.countNegCompetitor ? this.props.location.state.countNegCompetitor : 0,
-            timelineCompetitor: this.props.location.state.timelineCompetitor ? this.props.location.state.timelineCompetitor : [],
+            timelineCompetitor: this.props.location.state.timelineCompetitor ? this.props.location.state.timelineCompetitor[0] : [],
 
             //ids
             projId2: this.props.location.state.projId2,
@@ -144,7 +144,7 @@ class Board extends React.Component {
                     trigger1: json.body[this.state.projId1].triggerFeature,
 
                     //competitor
-                    timelineCompetitor: [json.body[this.state.projId1].timelineCountCompetitor][0],
+                    timelineCompetitor: json.body[this.state.projId1].timelineCountCompetitor[0],
                     word_sentiment_negative_competitor: json.body[this.state.projId1].word_pairings_Competitor_Neg,
                     word_sentiment_positive_competitor: json.body[this.state.projId1].word_pairings_Competitor_Pos,
                     countPozCompetitor: json.body[this.state.projId1].countPozCompetitor,
