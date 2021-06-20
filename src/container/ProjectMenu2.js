@@ -13,13 +13,12 @@ class ProjectMenu2 extends React.Component {
             countNeg2: this.props.location.state.countNeg2,
             count_retweets2: this.props.location.state.count_retweets2,
             count_tweets2: this.props.location.state.count_tweets2,
-            polarityValues2: this.props.location.state.polarityValues2,
+            polarityValues2: this.props.location.state.polarityValues2? this.props.location.state.polarityValues2:[],
             max_followers2: this.props.location.state.max_followers2,
             all_followers2: this.props.location.state.all_followers2,
             most_used_hashtag2: this.props.location.state.most_used_hashtag2,
             resultedTweets2: [],
-            tweets2: this.props.location.state.tweets2,
-            bubble_chart_data2: this.props.location.state.bubble_chart_data2,
+            bubble_chart_data2: this.props.location.state.bubble_chart_data2? this.props.location.state.bubble_chart_data2:[],
             trigger2: this.props.location.state.trigger2,
             avgPolarityTrigger2: this.props.location.state.avgPolarityTrigger2,
             impactedFollowersTrigger2: this.props.location.state.impactedFollowersTrigger2,
@@ -29,10 +28,34 @@ class ProjectMenu2 extends React.Component {
             feature2: this.props.location.state.feature2,
             trigger2: this.props.location.state.trigger2,
             date2: this.props.location.state.date2,
-            timeline2: this.props.location.state.timeline2,
+            timeline2: this.props.location.state.timeline2? this.props.location.state.timeline2:[],
             mostRetweetedTrigger2: this.props.location.state.mostRetweetedTrigger2,
         }
     }
+    componentWillReceiveProps(nextProps) {
+        this.setState({polarityValues2: nextProps.polarityValues2,
+            countPoz2: nextProps.countPoz2,
+            countNeg2: nextProps.countNeg2,
+            count_retweets2: nextProps.count_retweets2,
+            count_tweets2: nextProps.count_tweets2,
+            polarityValues2:nextProps.polarityValues2,
+            max_followers2: nextProps.max_followers2,
+            all_followers2: nextProps.all_followers2,
+            most_used_hashtag2: nextProps.most_used_hashtag2,
+            bubble_chart_data2: nextProps.bubble_chart_data2,
+            trigger2: nextProps.trigger2,
+            avgPolarityTrigger2: nextProps.avgPolarityTrigger2,
+            impactedFollowersTrigger2: nextProps.impactedFollowersTrigger2,
+            hashtagTrigger2: nextProps.hashtagTrigger2,
+            mostFollowedTrigger2: nextProps.mostFollowedTrigger2,
+            projectName2:nextProps.projectName2,
+            feature2: nextProps.feature2,
+            trigger2: nextProps.trigger2,
+            date2: nextProps.date2,
+            timeline2: nextProps.timeline2,
+            mostRetweetedTrigger2: nextProps.mostRetweetedTrigger2
+})
+      }
     render() {
         console.log(this.state.timeline2)
         console.log(this.state.projectName2)

@@ -12,23 +12,47 @@ class ProjectMenu3 extends React.Component {
             countNeg3: this.props.location.state.countNeg3,
             count_retweets3: this.props.location.state.count_retweets3,
             count_tweets3: this.props.location.state.count_tweets3,
-            polarityValues3: this.props.location.state.polarityValues3,
+            polarityValues3:  this.props.location.state.polarityValues3? this.props.location.state.polarityValues3:[],
             max_followers3: this.props.location.state.max_followers3,
             all_followers3: this.props.location.state.all_followers3,
             most_used_hashtag3: this.props.location.state.most_used_hashtag3,
             resultedTweets3: [],
             tweets3: this.props.location.state.tweets3,
-            bubble_chart_data3: this.props.location.state.bubble_chart_data3,
+            bubble_chart_data3: this.props.location.state.bubble_chart_data3? this.props.location.state.bubble_chart_data3:[],
             trigger3: this.props.location.state.trigger3,
             avgPolarityTrigger3: this.props.location.state.avgPolarityTrigger3,
             impactedFollowersTrigger3: this.props.location.state.impactedFollowersTrigger3,
             hashtagTrigger3: this.props.location.state.hashtagTrigger3,
             mostFollowedTrigger3: this.props.location.state.mostFollowedTrigger3,
-            timeline3: this.props.location.state.timeline3,
+            timeline3: this.props.location.state.timeline3?this.props.location.state.timeline3:[],
             mostRetweetedTrigger3: this.props.location.state.mostRetweetedTrigger3,
             projectName3: this.props.location.state.projectName3,
             feature3: this.props.location.state.feature3
         }
+    }
+    componentWillReceiveProps(nextProps) {
+        this.setState({polarityValues2: nextProps.polarityValues3,
+            countPoz3: nextProps.countPoz3,
+            countNeg3: nextProps.countNeg3,
+            count_retweets3: nextProps.count_retweets3,
+            count_tweets3: nextProps.count_tweets3,
+            polarityValues3:nextProps.polarityValues3,
+            max_followers3: nextProps.max_followers3,
+            all_followers3: nextProps.all_followers3,
+            most_used_hashtag3: nextProps.most_used_hashtag3,
+            bubble_chart_data3: nextProps.bubble_chart_data3,
+            trigger3: nextProps.trigger3,
+            avgPolarityTrigger3: nextProps.avgPolarityTrigger3,
+            impactedFollowersTrigger3: nextProps.impactedFollowersTrigger3,
+            hashtagTrigger3: nextProps.hashtagTrigger3,
+            mostFollowedTrigger3: nextProps.mostFollowedTrigger3,
+            projectName3:nextProps.projectName3,
+            feature3: nextProps.feature3,
+            trigger3: nextProps.trigger3,
+            date3: nextProps.date3,
+            timeline3: nextProps.timeline3,
+            mostRetweetedTrigger3: nextProps.mostRetweetedTrigger3
+})
     }
     render() {
         console.log(this.state.bubble_chart_data3)

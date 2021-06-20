@@ -44,7 +44,7 @@ def loadModel(preprocessedSearchedTweets):
  labeledTweetsDETAILED={}
  resultTwee={}
  for i in range(len(preprocessedSearchedTweets)):
-  results.append(round(tf_predictions[i][0].numpy().tolist(),2))
+  results.append(tf_predictions[i][0].numpy().tolist())
   resultsDETAILED.append(round(tf_predictions[i][0].numpy().tolist(),4))
   labeledTweets[preprocessedSearchedTweets[i]]=labels[label[i]];
   labeledTweetsDETAILED[preprocessedSearchedTweets[i]]=resultsDETAILED[i]
@@ -76,14 +76,6 @@ def loadModel(preprocessedSearchedTweets):
       word_sentiment_positive.append([word,APIcall.rt_paired_freq[word][1],'stroke-color: #703593; opacity:0.7; fill-color: #703593'])
      else:
       word_sentiment_negative.append([word,APIcall.rt_paired_freq[word][1],'stroke-color: #703593; opacity:0.7; fill-color: #703593'])
-#  print('&&&&&&&&&&&&&&')
-#  print(bubble_chart_data)
-#  array=np.array(results).tolist()
- #polarityToJson(df)
-#  print(labeledTweets)
-#  print('****************')
-#  print(APIcall.most_retweeted)
-#  print(APIcall.max_faved)
  polarityvals=df.values.tolist();
  jsonData={"labeledTweets":[labeledTweets],
            "labeledTweetsDETAILED":labeledTweetsDETAILED,
@@ -106,13 +98,4 @@ def loadModel(preprocessedSearchedTweets):
            "word_sentiment_positive":word_sentiment_positive,
            "word_sentiment_negative":word_sentiment_negative,
            "timeline":APIcall.timelineTimestamps}
- #print(jsonData)
  return jsonData
-
-# def polarityToJson(polarityValues):
-#   out=polarityValues.to_json(orient='records')
-#   with open('C:\\Users\\Admin\\Desktop\\an 3\\DemoSC\\demo_sc\\frontend\\src\\polarityValues.json', 'w') as f:
-#    f.seek(0) 
-#    f.write(out)
-#    f.truncate()
-#   return 

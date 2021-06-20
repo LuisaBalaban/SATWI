@@ -155,11 +155,11 @@ def register():
   valuesUser=(googleId, email, userName,"+401288381")
   cursor.execute( "INSERT INTO Users (ProvidedUserId, Email, Username, Phone) VALUES  (%s,%s,%s,%s)", valuesUser)
   conn.commit()
-  info=[]
-  info.append(userName)
-  info.append(googleId)
-  info.append(email)
-  return jsonify({"body": info}), 200
+  featuresInfo=[]
+  featuresInfo.append(userName)
+  featuresInfo.append(googleId)
+  featuresInfo.append(email)
+  return jsonify({"body": featuresInfo}), 200
   
   
 
@@ -206,6 +206,7 @@ def board():
       dates.append(date3)
       projectNames.append(projectName3)
       projectIds.append(random.getrandbits(28))
+    
   username = request.json['username']
   competitor=request.json['competitor']
   ReceiveRecommendations=request.json['ReceiveRecommendations']
@@ -227,35 +228,49 @@ def board():
       cursor.execute( "INSERT INTO Projects (BoardId, ProjectId, ProjectName, Feature, TriggerFeature, Date) VALUES (%s,%s,%s,%s,%s,%s)", valuesProject)
       conn.commit()
       jsonfeatures[feature]=ComputingData.extractingDataForFeatures(username,feature,dates[i],jsonfeatures)
-      j=0;
-      print("FEATURES")
-      print(jsonfeatures[feature]['timeline'][0])
-      print(dict(jsonfeatures[feature]['labeledTweets']).keys())
+      j=0
       for tweet in dict(jsonfeatures[feature]['labeledTweets']).keys():
-          print(dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet))
-          print( dict(jsonfeatures[feature]['labeledTweets']).get(tweet))
-          print(round(dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet),2))
-          valuesTweet=(projectIds[i], feature, tweet.encode('unicode_escape'), dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet), dict(jsonfeatures[feature]['labeledTweets']).get(tweet),round(dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet),2),APIcallDB.retweet_count_list[j], APIcallDB.followers_count_list[i],APIcallDB.hashtags_count_list[i],jsonfeatures[feature]['timeline'][0][j], False,  APIcallDB.ids[j], APIcallDB.tweetType[j])
+          valuesTweet=(projectIds[i], 
+                       feature, 
+                       tweet.encode('unicode_escape'), 
+                       dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet), 
+                       dict(jsonfeatures[feature]['labeledTweets']).get(tweet),
+                       round(dict(jsonfeatures[feature]['labeledTweetsDETAILED']).get(tweet),2),
+                       jsonfeatures[feature]['retweet_count_list'][j],
+                       jsonfeatures[feature]['followers_count_list'][j], 
+                       jsonfeatures[feature]['hashtags'][j],
+                       jsonfeatures[feature]['timeline'][j],
+                       False, 
+                       jsonfeatures[feature]['ids'][j],
+                       jsonfeatures[feature]['tweet_type'][j])
+          print(valuesTweet)
           cursor.execute( "insert into FeaturesTweets (ProjectID, Feature, Tweet, DetailedScore, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, TriggerState, TweetId, TweetType) values (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s,%s, %s)", valuesTweet)
           conn.commit()
           j=j+1
   for i in range(len(projectIds)):
       trigger=triggers[i]
+      feature=features[i]
       jsonfeatures[trigger]=ComputingData.extractingDataForTriggers(username,trigger,jsonfeatures)
       k=0
-      x=0
-      print("&&&&&&&&&&&&&******************&&&&&&&&")
-      print(j)
-      print("TRGGERS")
-      print(dict(jsonfeatures[trigger]['labeledTweets']).keys())
+      print("TRiGGERS")
       for tweet in dict(jsonfeatures[trigger]['labeledTweets']).keys():
-        if x==j:
-         valuesTweetTrigger=(projectIds[i], dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet), trigger, tweet.encode('unicode_escape'), dict(jsonfeatures[trigger]['labeledTweets']).get(tweet),round(dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet),2),APIcallDB.retweet_count_list[j], APIcallDB.followers_count_list[j],APIcallDB.hashtags_count_list[j],jsonfeatures[trigger]['timeline'][1][k], True, APIcallDB.ids[j], APIcallDB.tweetType[j])
+         valuesTweetTrigger=(projectIds[i], 
+                             dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet),
+                             trigger, 
+                             tweet.encode('unicode_escape'), 
+                             dict(jsonfeatures[trigger]['labeledTweets']).get(tweet),
+                             round(dict(jsonfeatures[trigger]['labeledTweetsDETAILED']).get(tweet),2),
+                             jsonfeatures[trigger]['retweet_count_list'][k], 
+                             jsonfeatures[trigger]['followers_count_list'][k],
+                             jsonfeatures[trigger]['hashtags'][k],
+                             jsonfeatures[trigger]['timeline'][k],
+                             True,
+                             jsonfeatures[trigger]['ids'][k], 
+                             jsonfeatures[trigger]['tweet_type'][k])
+         print(valuesTweetTrigger)
          cursor.execute( "insert into FeaturesTweets (ProjectID, DetailedScore, Feature, Tweet, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, TriggerState,TweetId, TweetType) values (%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s,%s, %s)", valuesTweetTrigger)
          conn.commit()
          k=k+1;
-        else:
-         x=x+1
   if competitor:
       set3=APIcall.creatingTestSet(competitor)
       preprocessedSearchedTweets3=Preprocess.processTweets(set3)
@@ -267,8 +282,8 @@ def board():
         cursor.execute( "insert into FeaturesTweets (ProjectID, DetailedScore, Feature, Tweet, Label, Score, CreatedAt, RetweetCount) values (%s,%s,%s,%s,%s,%s,%s, %s)", valuesCompetitor)
         conn.commit()
         m=m+1
-  
   jsonfeatures['ids']=projectIds;
+  jsonfeatures['BoardId']=BoardId;
   jsonfeatures=jsonify(jsonfeatures)
   return jsonfeatures
 
@@ -276,156 +291,218 @@ def board():
 @cross_origin()
 def boardStats():
   results={}
+  result={}
+  features=[]
+  projectNames=[]
+  triggers=[]
   noProjects=request.json['noProjects']
+  boardsId=request.json['boardsId']
+  feature1=request.json['feature1']
+  trigger1=request.json['trigger1']
+  projectName1=request.json['projectName1']
+  competitor=request.json['competitor']
   projectIds=[]
   if noProjects >= 1:
    projId1 = request.json['projId1']
    projectIds.append(projId1)
+   projectNames.append(projectName1)
+   features.append(feature1)
+   triggers.append(trigger1)
    if noProjects >= 2:
         projId2 = request.json['projId2']
+        feature2=request.json['feature2']
+        projectName2=request.json['projectName2']
+        trigger2=request.json['trigger2']
         projectIds.append(projId2)
+        triggers.append(trigger2)
+        features.append(feature2)
+        projectNames.append(projectName2)
         if noProjects==3:
             projId3 = request.json['projId3']
+            feature3=request.json['feature3']
+            trigger3=request.json['trigger3']
+            projectName3=request.json['projectName3']
+            triggers.append(trigger3)
+            features.append(feature3)
             projectIds.append(projId3)
+            projectNames.append(projectName3)
   conn = mysql.connect
   cursor = conn.cursor()
-  info={}
+  featuresInfo={}
+  triggersInfo=[]
+  i=0
   for projectId in projectIds:
-    cursor.execute( "SELECT * FROM FeaturesTweets WHERE ProjectId LIKE %s",[projectId])
+    values=(projectId, features[i])
+    cursor.execute( "SELECT * FROM FeaturesTweets WHERE ProjectId LIKE %s and feature like %s",values)
     conn.commit()
     data = list(cursor.fetchall())
-    info[projectId]=data
+    featuresInfo[projectId]=data
     tweetScore={}
-    triggerTweets=[]
     polarityVals=[]
-    triggerData=[]
     featureTweets=[]
     countPoz=0
-    allFollowersTrigger=0
+    tweetType=[]
     countNeg=0
-    hashtagsTrigger=''
     retweetCount={}
-    timeline=[]
-    averageTriggerPolarity=0
-    mostPopularUserTrigger=0
     mostRetweetedTweetFeature=0
     maxRet=0
     timelineCount=[]
-    maxFollowers=0
-    tweetType=[]
-    countPozCompetitor=0;
-    countNegCompetitor=0;
-    retweetCountCompetitor={}
-    polarityValsCompetitor=[]
-    timelineCompetitor=[]
-    timelineCountCompetitor=[]
-    competitorTweets=[]
-    competitorScore={}
-    cursor.execute( "SELECT boards.competitor FROM boards INNER join projects on projects.boardid=boards.boardid")
-    conn.commit()
-    boardCompetitor = list(cursor.fetchall())
-    print("*********")
-    print(boardCompetitor[0][0])
-    for tweet in info[projectId]:
-      if tweet[1]!=boardCompetitor[0][0]:
-        if tweet[10]==1:
-          print(tweet)
-          triggerTweets.append(tweet[2])
-          polarityVals.append([tweet[2], tweet[11]])
-          allFollowersTrigger+=tweet[6]
-          timeline.append(tweet[8])
-          hashtagsTrigger=hashtagsTrigger+tweet[7][0]
-          averageTriggerPolarity=averageTriggerPolarity+tweet[4]
-          if(maxFollowers<tweet[6]):
-            mostPopularUserTrigger=tweet[12]
-            maxFollowers=tweet[6]
-        else:
-          featureTweets.append(tweet[2])
-          tweetScore[tweet[2]]=tweet[11]
-          if tweet[4]==0:
-            countPoz+=1
-          if tweet[4]==1:
-            countNeg+=1;
-          polarityVals.append([tweet[2], tweet[11]])
-          retweetCount[tweet[2]]=tweet[5]
-          if(maxRet<tweet[5]):
-            mostRetweetedTweetFeature=tweet[12]
-            maxRet=tweet[5]
-          tweetType.append(tweet[13])
-          date_time_obj = datetime.strptime(tweet[8], '%Y-%m-%d %H:%M:%S')
-          timeline.append(date_time_obj)
-      else:
-        #competitor
-        competitorTweets.append(tweet[2])
-        competitorScore[tweet[2]]=tweet[11]
-        if tweet[4]==0:
-          countPozCompetitor+=1
-        if tweet[4]==1:
-          countNegCompetitor+=1
-        date_time_obj = datetime.strptime(tweet[8], '%Y-%m-%d %H:%M:%S')
-        timelineCompetitor.append(date_time_obj)
-        polarityValsCompetitor.append([tweet[2], tweet[11]])
-        retweetCountCompetitor[tweet[2]]=tweet[5]
-        
-    dataframe_Timeline_trigger=pd.DataFrame(timeline, columns=['date'])
-    dataframe_Timeline_trigger['day/month/year/hh'] = dataframe_Timeline_trigger['date'].apply(lambda x: "%d-%d-%d %d" % (x.month, x.day, x.year, x.hour))
-    dataframe_Timeline_trigger= dataframe_Timeline_trigger.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
-    timelineCount=dataframe_Timeline_trigger.to_numpy()
-    timelineCount=timelineCount.tolist()
-      
-      #competitor
-    dataframe_Timeline_competitor=pd.DataFrame(timelineCompetitor, columns=['date'])
-    dataframe_Timeline_competitor['day/month/year/hh'] = dataframe_Timeline_competitor['date'].apply(lambda x: "%d-%d-%d %d" % (x.month, x.day, x.year, x.hour))
-    dataframe_Timeline_competitor= dataframe_Timeline_competitor.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
-    timelineCountCompetitor=dataframe_Timeline_competitor.to_numpy()
-    timelineCountCompetitor=timelineCountCompetitor.tolist()
-    cursor.execute( "SELECT TriggerFeature, ProjectName, Feature from Projects WHERE ProjectId LIKE %s",[projectId])
-    conn.commit()
-    projectInfo = list(cursor.fetchall())
-    #feature
+    # cursor.execute("SELECT boards.competitor FROM boards as br INNER join projects as projs on projects.boardid=boards.boardid where projs.projectid like %s",[projectId])
+    # conn.commit()
+    # boardCompetitor = list(cursor.fetchall())
+    # print("*********")
+    # print(boardCompetitor[0][0])
+    # print("********")
+    # print(boardCompetitor)
+    for tweet in featuresInfo[projectId]:
+      print("&&&&&&")
+      print(tweet)
+      featureTweets.append(tweet[2])
+      tweetScore[tweet[2]]=tweet[11]
+      if tweet[4]==0:
+          countPoz+=1
+      if tweet[4]==1:
+          countNeg+=1;
+      polarityVals.append([tweet[2], tweet[11]])
+      retweetCount[tweet[2]]=tweet[5]
+      if(maxRet<tweet[5]):
+        mostRetweetedTweetFeature=tweet[12]
+        maxRet=tweet[5]
+      tweetType.append(tweet[13])
+      # date_time_obj = datetime.strptime(tweet[8], '%Y-%m-%d %H:%M:%S')
+      # timeline.append(date_time_obj)
+      print("-----MAX RET----")
+      print(maxRet)
     allTweets=ComputingData.createTweetsList(featureTweets)
     wordlist=allTweets.split()
     rt_paired_freq=ComputingData.pairRetCountWithWords(wordlist, retweetCount)
     word_pairings = ComputingData.pairingWordsWithRetCountAndPolarity(tweetScore,rt_paired_freq)
-    averageTriggerPolarity=averageTriggerPolarity/len(triggerTweets)*100;
-      
-      #competitor 
-    allCompetitorTweets=ComputingData.createTweetsList(competitorTweets)
-    wordlistCompetitor=allCompetitorTweets.split()
-    print("********&&&&&&&&&&&*********")
-    print(retweetCountCompetitor)
-    rt_paired_freq_Competitor=ComputingData.pairRetCountWithWords(wordlistCompetitor, retweetCountCompetitor)
-    word_pairings_competitor = ComputingData.pairingWordsWithRetCountAndPolarity(competitorScore,rt_paired_freq_Competitor)
-    results[projectId]={
+    
+    result[features[i]]={
        'polarityVals':polarityVals,
-        'triggerFeature':projectInfo[0][0],
-        'feature':projectInfo[0][2],
-        'projectName':projectInfo[0][1],
-        'countPozCompetitor':countPozCompetitor,
-        'countNegCompetitor':countNegCompetitor,
-       "timelineCountCompetitor": [timelineCountCompetitor],
-       "word_pairings_Competitor_Pos":word_pairings_competitor['word_sentiment_positive'],
-        "word_pairings_Competitor_Neg":word_pairings_competitor['word_sentiment_negative'],
-        'added_polarity_Competitor':word_pairings_competitor['added_polarity'],
+        'projectName':projectNames[i],
        'countPoz':countPoz,
        'tweetType':tweetType,
         'countNeg':countNeg,
-        'averageTriggerPolarity':averageTriggerPolarity,
-        'hashtagsTrigger':hashtagsTrigger,
-        'timeline':timelineCount,
-        'allFollowersTrigger':allFollowersTrigger,
       'word_pairings':word_pairings,
       'rt_paired_freq':rt_paired_freq, 
       'word_sentiment_positive':word_pairings['word_sentiment_positive'],
       "word_sentiment_negative":word_pairings['word_sentiment_negative'],
       "polarity":word_pairings['added_polarity'],
       "bubble_chart_data":word_pairings['bubble_chart_data'],
-      # "rts":[item[0] for item in rt_paired_freq.values()],
-      # "freq":[item[1] for item in rt_paired_freq.values()],
-      # "words": rt_paired_freq,
       "mostRetweetedTweetFeature":str(mostRetweetedTweetFeature),
-      'mostPopularUserTrigger':str(mostPopularUserTrigger)
-        }
+    }
+    i=i+1
+  print("&&&&&&&&&&&  resuts &&&&&&&&&&&&&&&&&&&")
+  print(results)
+  i=0
+  for projectId in projectIds:
+    values=(projectId, triggers[i])
+    print("***")
+    print(values)
+    cursor.execute( "SELECT * FROM FeaturesTweets WHERE ProjectId LIKE %s and feature like %s",values)
+    conn.commit()
+    data2 = list(cursor.fetchall())
+    triggersInfo=data2
+    triggerTweets=[]
+    timeline=[]
+    averageTriggerPolarity=0
+    mostPopularUserTrigger=0
+    hashtagsTrigger=''
+    allFollowersTrigger=0
+    triggerData=[]
+    maxFollowers=0
+    for tweet in triggersInfo:
+          print(tweet)
+          triggerTweets.append(tweet[2])
+          allFollowersTrigger+=tweet[6]
+          timeline.append(tweet[8])
+          if tweet[7]!='NaN':
+           hashtagsTrigger=hashtagsTrigger+' '+tweet[7]
+          averageTriggerPolarity=averageTriggerPolarity+tweet[11]
+          if(maxFollowers<tweet[6]):
+            mostPopularUserTrigger=tweet[12]
+            maxFollowers=tweet[6]
+          print("-----MAX RET----")
+          print(maxFollowers)
+    print("TIMELINE TRIGGER")
+    print(timeline)
+    dataframe_Timeline_trigger=pd.DataFrame(timeline, columns=['date'])
+    dataframe_Timeline_trigger['date']= pd.to_datetime(dataframe_Timeline_trigger['date'])
+    dataframe_Timeline_trigger['day/month/year/hh'] = dataframe_Timeline_trigger['date'].apply(lambda x: "%d-%d-%d %d" % (x.month, x.day, x.year, x.hour))
+    dataframe_Timeline_trigger= dataframe_Timeline_trigger.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
+    timelineCount=dataframe_Timeline_trigger.to_numpy()
+    timelineCount=timelineCount.tolist()
+    print('PRINTING AVERAGE POALRITY')
+    print(averageTriggerPolarity)
+    averageTriggerPolarity=averageTriggerPolarity/len(triggerTweets)*100;
+    print(averageTriggerPolarity)
+    result[triggers[i]]={
+        'projectName':projectNames[i],
+        'averageTriggerPolarity':averageTriggerPolarity,
+        'hashtagsTrigger':hashtagsTrigger,
+        'timeline':timelineCount,
+        'allFollowersTrigger':allFollowersTrigger,
+        'mostPopularUserTrigger':str(mostPopularUserTrigger)
+        
+    }
+    i=i+1
+  competitorInfo=[]
+  values=[competitor]
+  print("VALUES !!!")
+  print(values)
+  cursor.execute( "SELECT * FROM FeaturesTweets WHERE feature like %s",values)
+  conn.commit()
+  data3=list(cursor.fetchall())
+  competitorInfo=data3
+  print(competitorInfo)
+  createdAtCompetitor=[]
+  countPozCompetitor=0;
+  countNegCompetitor=0;
+  retweetCountCompetitor={}
+  polarityValsCompetitor=[]
+  timelineCompetitor=[]
+  timelineCountCompetitor=[]
+  competitorTweets=[]
+  competitorScore={}
+  for tweet in competitorInfo:
+   competitorTweets.append(tweet[2])
+   competitorScore[tweet[2]]=tweet[11]
+   createdAtCompetitor.append(tweet[8])
+   if tweet[4]==0:
+      countPozCompetitor+=1
+   if tweet[4]==1:
+      countNegCompetitor+=1
+   retweetCountCompetitor[tweet[2]]=tweet[5]
+     # date_time_obj = datetime.strptime(tweet[8], '%Y-%m-%d %H:%M:%S')
+  # timelineCompetitor.append(date_time_obj)
+  # polarityValsCompetitor.append([tweet[2], tweet[11]])
+  print("---------------------TIMELINE COMPETITOR-----------------------")
+  print(createdAtCompetitor)
+  dataframe_Timeline_competitor=pd.DataFrame(createdAtCompetitor, columns=['date'])
+  dataframe_Timeline_competitor['date']= pd.to_datetime(dataframe_Timeline_competitor['date'])
+  dataframe_Timeline_competitor['day/month/year/hh'] = dataframe_Timeline_competitor['date'].apply(lambda x: "%d-%d-%d %d" % (x.month, x.day, x.year, x.hour))
+  dataframe_Timeline_competitor= dataframe_Timeline_competitor.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()  
+  timelineCountCompetitor=dataframe_Timeline_competitor.to_numpy()
+  timelineCountCompetitor=timelineCountCompetitor.tolist()
+  allCompetitorTweets=ComputingData.createTweetsList(competitorTweets)
+  wordlistCompetitor=allCompetitorTweets.split()
+  print("********&&&&&&&&&&&*********")
+  print(retweetCountCompetitor)
+  rt_paired_freq_Competitor=ComputingData.pairRetCountWithWords(wordlistCompetitor, retweetCountCompetitor)
+  word_pairings_competitor = ComputingData.pairingWordsWithRetCountAndPolarity(competitorScore,rt_paired_freq_Competitor)
+  result[competitor]={
+        'countPozCompetitor':countPozCompetitor,
+        'countNegCompetitor':countNegCompetitor,
+       "timelineCountCompetitor": timelineCountCompetitor,
+       "word_pairings_Competitor_Pos":word_pairings_competitor['word_sentiment_positive'],
+       "word_pairings_Competitor_Neg":word_pairings_competitor['word_sentiment_negative']
+    }
+  for i in range(len(projectIds)):
+    results[projectIds[i]]={features[i]:result[features[i]],
+                            triggers[i]:result[triggers[i]],
+                            competitor:result[competitor]}
+  print(results)
   return jsonify({"body": results}), 200
 
 l = StdOutListener()

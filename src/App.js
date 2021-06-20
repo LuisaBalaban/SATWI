@@ -51,6 +51,7 @@ class App extends React.Component {
             username: json['body'][0][1],
             competitor:json['body'][0][2],
             projectName1:json['body'][2][0][0],
+            boardsId:json['body'][0][0],
             feature1:json['body'][2][0][1],
             trigger1: json['body'][2][0][2],
             date1:json['body'][2][0][3],
@@ -65,7 +66,7 @@ class App extends React.Component {
             trigger3: json['body'][2][2]? json['body'][2][2][2]:'',
             date3: json['body'][2][2]? json['body'][2][2][3]:'',
             projId3:json['body'][2][2]? json['body'][2][2][4]:'',
-            noProjects: json['body'][2][1]?  json['body'][2][2][0] ? 3 : 2 : 1
+            noProjects: json['body'][2][1]?  json['body'][2][2] ? 3 : 2 : 1
           }
           })
       })

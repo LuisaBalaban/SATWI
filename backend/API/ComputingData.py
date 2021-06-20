@@ -10,51 +10,67 @@ import pandas as pd
 def extractingDataForFeatures(username,feature,date,jsonfeatures):
     query1=feature+' '+username+' since:'+date
     set1=APIcallDB.creatingTestSet(query1)
-    print("FEATURE PREPROC SET")
-    preprocessedSearchedTweets1=Preprocess.processTweets(set1)
-    print(preprocessedSearchedTweets1)
+    preprocessedSearchedTweets1=Preprocess.processTweets(set1['result'])
     labeledTweets1=SADB.loadModel(preprocessedSearchedTweets1)
-    jsonfeatures[feature]=computeDataForFeature(labeledTweets1)
+    jsonfeatures[feature]=computeDataForFeature(labeledTweets1, set1['tweet_information'])
     return jsonfeatures[feature]
 
 def extractingDataForTriggers(username,trigger,jsonfeatures):
     query2=trigger+' '+username
     set2=APIcallDB.creatingTestSet(query2)
-    preprocessedSearchedTweets2=Preprocess.processTweets(set2)
+    print("SET 2 TRIGGER")
+    print(set2)
+    preprocessedSearchedTweets2=Preprocess.processTweets(set2['result'])
+    print(preprocessedSearchedTweets2)
     labeledTweets2=SADB.loadModel(preprocessedSearchedTweets2)
-    jsonfeatures[trigger]=labeledTweets2
-    jsonfeatures[trigger]=computeDataForFeature(labeledTweets2)
-    #print("Printing trigger data")
+    jsonfeatures[trigger]=computeDataForFeature(labeledTweets2,set2['tweet_information'])
+    print(jsonfeatures[trigger])
     return jsonfeatures[trigger]
 
-def computeDataForFeature(labeledTweets):
-   max_faved=APIcallDB.max_faved
+def computeDataForFeature(labeledTweets, set):
    rt_paired_freq={}
    allTweets=''
    tweets = labeledTweets['labeledTweetsDETAILED']
    allTweets=createTweetsList(tweets.keys())
    wordlist=allTweets.split()
    wordPairs=createWordsListFromTweets(wordlist,allTweets)
-   rt_paired_freq=pairRetCountWithWords(wordlist, APIcallDB.tweets_rt_count)
+   rt_paired_freq=pairRetCountWithWords(wordlist,set['retweet_count_dict'])
    word_pairings = pairingWordsWithRetCountAndPolarity(tweets,rt_paired_freq)
    df = pd.DataFrame(labeledTweets.items(), columns=['Tweet','results'])
    polarityvals=df.values.tolist();
+  #  dataframe_Timeline=pd.DataFrame(created_at, columns=['date'])
+  #  timelineRepeatedList=dataframe_Timeline.reset_index();
+  #  timelineRepeatedList=timelineRepeatedList.to_numpy()
+  #  timelineRepeatedList=timelineRepeatedList.tolist()
+  #  for i in range(len(timelineRepeatedList)):
+  #       timelineRepeatedList[i]=timelineRepeatedList[i][1]    
+  #  dataframe_Timeline['day/month/year/hh'] = dataframe_Timeline['date'].apply(lambda x: "%d-%d-%d %d" % (x.month, x.day, x.year, x.hour))
+  #  print("*********************************")
+  #  print(timelineRepeatedList)
+  #  timelineTimestamps.append(timelineRepeatedList)
+  #  dataframe_Timeline= dataframe_Timeline.groupby(['day/month/year/hh']).size().to_frame('count').reset_index()
+  #  timeline=dataframe_Timeline.to_numpy()
+  #  timeline=timeline.tolist()
    data={'labeledTweets':labeledTweets['labeledTweets'],
          'labeledTweetsDETAILED':labeledTweets['labeledTweetsDETAILED'],
          'score':labeledTweets['scores'],
           'results':polarityvals,
-          "count":APIcallDB.count(),
-          "mostRetweeted":str(APIcallDB.most_retweeted),
           "rts":[item[0] for item in rt_paired_freq.values()],
            "freq":[item[1] for item in rt_paired_freq.values()],
            "words": rt_paired_freq,
-           "max_followers":str(max_faved),
-           "total_no_rtweets":APIcallDB.total_no_retweets,
+         #  "max_followers":str(max_faved),
+          #  "total_no_rtweets":APIcallDB.total_no_retweets,
            "total_no_tweets":30,
-           "timeline":APIcallDB.timelineTimestamps,
-           "no_hashtags":len(APIcallDB.hashtags_pairing_id.keys()),
-           "all_followers":APIcallDB.all_followers,
-           "most_used_hashtag":str(APIcallDB.most_used_hashtag),
+           "timeline":set['created_at'],
+           "no_hashtags":len(set['hashtags_pairing_id'].keys()),
+           "followers_count_list":set['followers_count_list'],
+          #  "most_used_hashtag":str(APIcallDB.most_used_hashtag),
+          "tweet_type":set['tweet_type'],
+          "retweet_count_list":list(set['retweet_count_dict'].values()),
+          "hashtags":set['hashtags'],
+          "followers_count_list":set['followers_count_list'],
+          "hashtags_dict":set['hashtags_pairing_id'],
+          "ids":set['ids'],    
            'word_sentiment_positive':word_pairings['word_sentiment_positive'],
            "word_sentiment_negative":word_pairings['word_sentiment_negative'],
            "polarity":word_pairings['added_polarity'],
@@ -73,13 +89,13 @@ def pairingWordsWithRetCountAndPolarity(tweets,rt_paired_freq):
        for word in words:
             polarity=0
             for word_frq in rt_paired_freq.keys():
-                if word.lower()==word_frq.lower():
+              if word.lower()==word_frq.lower():
                  polarity=tweets[tweet]
                  if word_frq in added_polarity:
                     added_polarity[word]=polarity+added_polarity[word_frq]
                  else:
                     added_polarity[word]=polarity
-            added_polarity[word]=polarity/rt_paired_freq[word_frq][1]
+              added_polarity[word]=polarity/rt_paired_freq[word_frq][1]
   for word in rt_paired_freq.keys():
        if rt_paired_freq[word][1]>=2:
             # if word not in spam_words:
@@ -87,10 +103,8 @@ def pairingWordsWithRetCountAndPolarity(tweets,rt_paired_freq):
                     bubble_chart_data.append([word,added_polarity[word],rt_paired_freq[word][1],rt_paired_freq[word][0]])
                 if added_polarity[word]<0.5:
                      word_sentiment_positive.append([word,rt_paired_freq[word][1],'stroke-color: #703593; opacity:0.7; fill-color: #703593'])
-                else:
+                if added_polarity[word]>0.5:
                      word_sentiment_negative.append([word,rt_paired_freq[word][1],'stroke-color: #703593; opacity:0.7; fill-color: #703593'])
-  print("PRINTING BUBBLE CHrt")
-  print(bubble_chart_data)
   word_pairings={'word_sentiment_negative':word_sentiment_negative,
     'word_sentiment_positive':word_sentiment_positive,
     'bubble_chart_data':bubble_chart_data,

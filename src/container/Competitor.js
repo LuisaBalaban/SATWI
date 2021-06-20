@@ -40,7 +40,7 @@ class Competitor extends React.Component {
                         <h1>Competitor analysis - {this.state.competitor}</h1>
                         <hr class="rounded"></hr>
                             <div className="inline-charts"> 
-                                <Chart
+                            {this.state.bubble_chart_data1 ?  <Chart
                                     width={'500px'}
                                     height={'200px'}
                                     chartType="BarChart"
@@ -65,7 +65,7 @@ class Competitor extends React.Component {
                                     }}
                                     // For tests
                                     rootProps={{ 'data-testid': '1' }}
-                                />
+                                /> : "Not enough data"}
                                 <Chart
                                     width={'500px'}
                                     height={'200px'}
