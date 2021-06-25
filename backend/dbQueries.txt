@@ -109,3 +109,16 @@ ADD TweetId BIGINT NOT NULL;
 ALTER TABLE FeaturesTweets
 ADD TweetType VARCHAR (20);
 DELETE FROM FeaturesTweets;
+
+ALTER TABLE users
+ADD createdAt TIMESTAMP;
+
+ALTER TABLE users
+ADD phoneNumber VARCHAR(11);
+
+ALTER TABLE users
+ADD profilePic VARCHAR(500);
+
+
+ALTER TABLE boards
+Add noprojects INT(3);

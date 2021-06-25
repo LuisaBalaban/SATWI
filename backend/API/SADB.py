@@ -1,8 +1,4 @@
 import pandas as pd
-import re
-import string
-import time
-import json
 import numpy as np
 from transformers import BertTokenizer, TFBertForSequenceClassification
 from tensorflow.keras.backend import clear_session

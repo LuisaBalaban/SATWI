@@ -1,17 +1,9 @@
 import pandas as pd
 import numpy as np
-import json
-import collections
-import twitter
 from pickle import load
-import joblib
-import string
 from numpy import array
-import nltk
-import re
 from nltk.corpus import stopwords
 from sklearn import preprocessing
-import random
 import tweepy
 from API import Connect as connect
 from collections import Counter

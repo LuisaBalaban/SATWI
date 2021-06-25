@@ -1,13 +1,5 @@
 import './index.css';
 import './elements.css';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useRouteMatch
-} from "react-router-dom";
-import Routes from './Routes';
 import GoogleLogin from 'react-google-login'
 import React from 'react';
 import landingImage from './images/landing.svg'
@@ -24,6 +16,12 @@ class App extends React.Component {
   responseGoogle=(response)=>{
     console.log(response);
     console.log(response.profileObj);
+    this.setState(
+      {
+        userId:response.profileObj["googleId"]
+      }
+    )
+    console.log(this.state.userId)
     fetch("http://127.0.0.1:5000/profileBoard", {
             method: "POST",
             body: JSON.stringify({
@@ -48,25 +46,27 @@ class App extends React.Component {
         this.props.history.push({ pathname: '/board',
         state: {
             isLogin:true,
-            username: json['body'][0][1],
-            competitor:json['body'][0][2],
-            projectName1:json['body'][2][0][0],
-            boardsId:json['body'][0][0],
-            feature1:json['body'][2][0][1],
-            trigger1: json['body'][2][0][2],
-            date1:json['body'][2][0][3],
-            projId1:json['body'][2][0][4],
-            projectName2: json['body'][2][1] ? json['body'][2][1][0] : '' ,
-            feature2:json['body'][2][1] ? json['body'][2][1][1] : '',
-            trigger2: json['body'][2][1] ? json['body'][2][1][2]  : '',
-            date2:json['body'][2][1] ? json['body'][2][1][3] : '',
-            projId2:json['body'][2][1] ? json['body'][2][1][4]  :'',
-            projectName3: json['body'][2][2] ? json['body'][2][2][0] : '',
-            feature3: json['body'][2][2] ?json['body'][2][2][1]:'',
-            trigger3: json['body'][2][2]? json['body'][2][2][2]:'',
-            date3: json['body'][2][2]? json['body'][2][2][3]:'',
-            projId3:json['body'][2][2]? json['body'][2][2][4]:'',
-            noProjects: json['body'][2][1]?  json['body'][2][2] ? 3 : 2 : 1
+            email:json['body']['email'],
+            username: json['body']['twitterHandle'],
+            competitor:json['body']['competitor'],
+            projectName1:json['body']['projects'][0][0],
+            boardsId:json['body']['boardId'],
+            feature1:json['body']['projects'][0][1],
+            trigger1: json['body']['projects'][0][2],
+            date1:json['body']['projects'][0][2],
+            projId1:json['body']['projects'][0][4],
+            projectName2: json['body']['projects'][1] ? json['body']['projects'][1][0] : '' ,
+            feature2:json['body']['projects'][1] ? json['body']['projects'][1][1] : '',
+            trigger2: json['body']['projects'][1] ? json['body']['projects'][1][2]  : '',
+            date2:json['body']['projects'][1] ? json['body']['projects'][1][3] : '',
+            projId2:json['body']['projects'][1] ? json['body']['projects'][1][4]  :'',
+            projectName3: json['body']['projects'][2] ? json['body']['projects'][2][0] : '',
+            feature3: json['body']['projects'][2] ?json['body']['projects'][2][1]:'',
+            trigger3: json['body']['projects'][2]? json['body']['projects'][2][2]:'',
+            date3: json['body']['projects'][2]? json['body']['projects'][2][3]:'',
+            projId3:json['body']['projects'][2]? json['body']['projects'][2][4]:'',
+            noProjects: json['body']['projects'][1]?  json['body']['projects'][2] ? 3 : 2 : 1,
+            userId:this.state.userId
           }
           })
       })
@@ -77,7 +77,8 @@ class App extends React.Component {
     this.state = {
     scrollEnd:'',
     scrollEnd2:'',
-    pathname:''
+    pathname:'',
+    userId:""
     }
 
     this.findOutMore=this.findOutMore.bind(this);
@@ -134,7 +135,7 @@ class App extends React.Component {
   render() {
 
   return (
-    <div>
+    <div id="landing-page">
       <header>
         <div className="image-landing">
         <img src={landingImage} alt="Kiwi standing on oval"/>
@@ -201,7 +202,7 @@ class App extends React.Component {
          {/* <button onClick={this.loginBrand} className="btn-user">Log in</button> */}
          <div id="signInButton"><GoogleLogin
         clientId='332583792653-4sev4321k5ssjukodjmmbbmot21daq12.apps.googleusercontent.com'
-        buttonText="Login"
+        buttonText="Login with Google"
         onSuccess={this.responseGoogle}
         onFailure={this.responseGoogle}
         cookiePolicy={'single_host_origin'}

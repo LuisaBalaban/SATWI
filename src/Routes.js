@@ -5,6 +5,7 @@ import Login from './components/Login';
 import UserInterface from './components/UserInterface';
 import BoardConfig from './components/BoardConfig'
 import Board from './components/Board'
+import UserProfile from './components/UserProfile';
 
 
 function Routes() {
@@ -20,7 +21,7 @@ function Routes() {
         <Route path="/board" component={Board} />
         <Route path='/board-config' component={BoardConfig}/>
         {/* <Route path='/board-stats' component={Board}/> */}
-
+        <Route path='/profile' component={UserProfile}/>
      </Router>
      
     </div>

@@ -1,8 +1,4 @@
 import pandas as pd
-import re
-import string
-import time
-import json
 import numpy as np
 from transformers import BertTokenizer, TFBertForSequenceClassification
 from tensorflow.keras.backend import clear_session
@@ -12,7 +8,6 @@ import tensorflow as tf
 from flask import jsonify
 from API import APIcall as APIcall
 from API import Preprocess as preprocess
-import json
 from nltk.corpus import stopwords
 # spam_words=['act','get','got','like','please','make','buy','call','click','compare','free','get','open','opt','order','order','miss','yourself','Sign','Stop','subscription','link','chance','next','unsubscribe','visit','Competitions','Congratulations','giveaway','prize','prizes','Win','Winner','Won','winner','selected','Order','shipped','retweet','follow','$$$', 'dollars','cash','think','least','would','could','already','away','us','says', '-', '_', 'im', 'still', 'back', 'deal!', 'deal', 'go', 'like', 'said','one', 'mates']
 spam_words=[]
@@ -42,7 +37,6 @@ def loadModel(preprocessedSearchedTweets):
  label = label.numpy()
  labeledTweets={}
  labeledTweetsDETAILED={}
- resultTwee={}
  for i in range(len(preprocessedSearchedTweets)):
   results.append(tf_predictions[i][0].numpy().tolist())
   resultsDETAILED.append(round(tf_predictions[i][0].numpy().tolist(),4))

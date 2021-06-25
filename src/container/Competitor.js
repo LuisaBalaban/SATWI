@@ -40,7 +40,7 @@ class Competitor extends React.Component {
                         <h1>Competitor analysis - {this.state.competitor}</h1>
                         <hr class="rounded"></hr>
                             <div className="inline-charts"> 
-                            {this.state.bubble_chart_data1 ?  <Chart
+                            {this.state.word_sentiment_negative_competitor ?  <Chart
                                     width={'500px'}
                                     height={'200px'}
                                     chartType="BarChart"

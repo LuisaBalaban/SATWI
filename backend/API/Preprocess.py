@@ -1,10 +1,7 @@
 import re
 from nltk.tokenize import word_tokenize
 from string import punctuation
-from mtranslate import translate
 from nltk.corpus import stopwords
-import collections
-import itertools
 
 _stopWords = set(stopwords.words('english') + list(punctuation) + ['AT_USER', 'URL'])
 def _processTweet(tweet):

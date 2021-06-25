@@ -1,5 +1,4 @@
-import twitter
-import collections
+
 import pandas as pd
 import numpy as np
 import tweepy
@@ -44,6 +43,7 @@ def count():
  return count;
 
 def extractTweetData(tweet_info, created_at,ids,tweetType,retweet_count_dict, followers_count_list, hashtags_pairing_id,tweet_followers,hashtags):
+    print(tweet_info.created_at)
     created_at.append(tweet_info.created_at)
     ids.append(tweet_info.id)
     if 'retweeted_status' in dir(tweet_info):
