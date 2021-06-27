@@ -9,9 +9,11 @@ import Chart from "react-google-charts";
 import ProjectMenu2 from '../container/ProjectMenu2';
 import ProjectMenu3 from '../container/ProjectMenu3';
 import Competitor from '../container/Competitor';
+import Account from '../components/Account';
 import { jsPDF } from "jspdf";
 import google from 'google-charts'
 import "jspdf-autotable";
+import { TwitterMentionButton, TwitterHashtagButton } from 'react-twitter-embed';
 
 class Board extends React.Component {
     constructor(props) {
@@ -113,11 +115,49 @@ class Board extends React.Component {
             featureTweets: [],
             triggerTweets: [],
 
-            projects: []
+            projects: [],
+            //account
+            hashtagsListAccount: this.props.location.state.hashtagsListAccount ? this.props.location.state.hashtagsListAccount : [],
+            negativeTweets: this.props.location.state.negativeTweets ? this.props.location.state.negativeTweets : [],
+            countPozAcc: this.props.location.state.countPozAcc ? this.props.location.state.countPozAcc : 0,
+            countNegAcc: this.props.location.state.countNegAcc ? this.props.location.state.countNegAcc : 0,
+            mostNegativeTweets: this.props.location.state.mostNegativeTweets ? this.props.location.state.mostNegativeTweets : 0,
+            timelineAccount: this.props.location.state.timelineAccount ? this.props.location.state.timelineAccount : [],
+            timelineId:this.props.location.state.timelineId ? this.props.location.state.timelineId  : 0
+
         }
         this.goToProfile = this.goToProfile.bind(this);
     }
 
+    pushTimeline(date, countNeg, countPoz) {
+        console.log("making db request for pusihn timeline")
+
+        fetch("http://127.0.0.1:5000/addTimeline", {
+            method: "POST",
+            body: JSON.stringify({
+                date: date,
+                countNeg:countNeg,
+                countPoz:countPoz,
+                timelineId:this.state.timelineId
+
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+        }
+        ).then(response => {
+            console.log(response)
+            return response.json()
+        })
+            .then(json => {
+                console.log(json)
+                this.setState({
+                    timelineAccount:this.state.timelineAccount.concat(json['body'])
+                })
+
+            })
+    }
     fetchUsers() {
 
         console.log("making db request")
@@ -136,6 +176,7 @@ class Board extends React.Component {
                 trigger1: this.state.trigger1,
                 trigger2: this.state.trigger2,
                 trigger3: this.state.trigger3,
+                username: this.state.username,
                 competitor: this.state.competitor,
                 projectName1: this.state.projectName1,
                 projectName2: this.state.projectName2,
@@ -173,7 +214,7 @@ class Board extends React.Component {
 
                     avgPolarityTrigger2: json.body[this.state.projId2] ? json.body[this.state.projId2][this.state.trigger2].averageTriggerPolarity : 0,
                     bubble_chart_data2: json.body[this.state.projId2] ? json.body[this.state.projId2][this.state.feature2].bubble_chart_data : 0,
-                    hashtagTrigger2: json.body[this.state.projId2] ? json.body[this.state.projId2][this.state.trigger2].hashtagsTrigger : 0,
+                    hashtagTrigger2: json.body[this.state.projId2] ? json.body[this.state.projId2][this.state.trigger2].hashtagsTrigger : 'No associated hashtags',
                     polarityValues2: json.body[this.state.projId2] ? json.body[this.state.projId2][this.state.feature2].polarityVals : [],
                     countPoz2: json.body[this.state.projId2] ? json.body[this.state.projId2][this.state.feature2].countPoz : 0,
                     countNeg2: json.body[this.state.projId2] ? json.body[this.state.projId2][this.state.feature2].countNeg : 0,
@@ -186,7 +227,7 @@ class Board extends React.Component {
 
                     avgPolarityTrigger3: json.body[this.state.projId3] ? json.body[this.state.projId3][this.state.trigger3].averageTriggerPolarity : 0,
                     bubble_chart_data3: json.body[this.state.projId3] ? json.body[this.state.projId3][this.state.feature3].bubble_chart_data : 0,
-                    hashtagTrigger2: json.body[this.state.projId3] ? json.body[this.state.projId3][this.state.trigger3].hashtagsTrigger : 0,
+                    hashtagTrigger2: json.body[this.state.projId3] ? json.body[this.state.projId3][this.state.trigger3].hashtagsTrigger : 'No associated hashtags',
                     polarityValues3: json.body[this.state.projId3] ? json.body[this.state.projId3][this.state.feature3].polarityVals : [],
                     countPoz3: json.body[this.state.projId3] ? json.body[this.state.projId3][this.state.feature3].countPoz : 0,
                     countNeg3: json.body[this.state.projId3] ? json.body[this.state.projId3][this.state.feature3].countNeg : 0,
@@ -205,19 +246,31 @@ class Board extends React.Component {
                     countPozCompetitor: json.body[this.state.projId1][this.state.competitor].countPozCompetitor,
                     countNegCompetitor: json.body[this.state.projId1][this.state.competitor].countNegCompetitor,
 
+                    //account
+                    mostFollwedAccounts: json.body[this.state.projId1][this.state.username].mostFollwedAccounts,
+                    hashtagsListAccount: json.body[this.state.projId1][this.state.username].hashtagsListAccount,
+                    mostNegativeTweets: json.body[this.state.projId1][this.state.username].mostNegativeTweets,
+                    countPozAcc: json.body[this.state.projId1][this.state.username].countPozAcc,
+                    countNegAcc: json.body[this.state.projId1][this.state.username].countNegAcc,
+                    // timelineAccount:this.state.timelineAccount.concat(new Date(),  json.body[this.state.projId1][this.state.username].countPozAcc, json.body[this.state.projId1][this.state.username].countNegAcc),
+                    // timelineId:json.body['timelineId']
 
                 })
+                // this.setState(previousState => ({
+                //     timelineAccount: [...previousState.timelineAccount, [new Date(), this.state.countNegAcc, this.state.countPozAcc]]
+                // }));
                 console.log(this.state.word_sentiment_negative_competitor)
-                console.log(this.state.timeline1)
+                console.log(this.state.timelineAccount)
                 console.log(json.body[this.state.projId1].timelineCountCompetitor)
-
+                console.log(this.state.timelineAccount)
+                this.pushTimeline(new Date(), json.body[this.state.projId1][this.state.username].countNegAcc, json.body[this.state.projId1][this.state.username].countPozAcc)
             })
     }
 
 
     componentDidMount() {
         this.fetchUsers();
-        this.timer = setInterval(() => this.fetchUsers(), 30000);
+        this.timer = setInterval(() => this.fetchUsers(), 100000);
         //console.log(this.state.projId1)
     }
 
@@ -292,26 +345,26 @@ class Board extends React.Component {
         doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
         const tableRowsCompetitorPositive = []
         const tableColumnCompetitorPositive = ["Word", "No. of appereances"]
-        
-        let y=350
+
+        let y = 350
         if (y >= pageHeight) {
             doc.addPage();
             y = 30
         }
         doc.text("Competitor: " + this.state.competitor, 20, y);
         if (this.state.word_sentiment_positive_competitor != []) {
-            doc.text("Most frequent positive associated words with the competitor: " + this.state.competitor, 20, y+10);
+            doc.text("Most frequent positive associated words with the competitor: " + this.state.competitor, 20, y + 10);
             this.state.word_sentiment_positive_competitor.map(item => {
                 if (item[1] > 5)
                     tableRowsCompetitorPositive.push(item)
             })
             doc.autoTable(tableColumnCompetitorPositive, tableRowsCompetitorPositive, {
-                startY: y+20,
+                startY: y + 20,
                 tableWidth: 50
             });
         }
         else {
-            doc.text("Not enough data. ", 20, y+10);
+            doc.text("Not enough data. ", 20, y + 10);
         }
 
         if (this.state.word_sentiment_negative_competitor != []) {
@@ -320,32 +373,32 @@ class Board extends React.Component {
                 if (item[1] > 3)
                     tableRowsCompetitorNegative.push(item)
             })
-            doc.text("Most frequent negative associated words with the competitor: " + this.state.competitor, 20, y+110);
+            doc.text("Most frequent negative associated words with the competitor: " + this.state.competitor, 20, y + 110);
             doc.autoTable(tableColumnCompetitorPositive, tableRowsCompetitorNegative, {
-                startY: y+120,
+                startY: y + 120,
                 tableWidth: 50
             });
         }
         else {
-            doc.text("Not enough data. ", 20, y+110);
+            doc.text("Not enough data. ", 20, y + 110);
         }
-        doc.text("Sentiment partition of competitor tweets", 20, y+150);
+        doc.text("Sentiment partition of competitor tweets", 20, y + 150);
         const tableColumnCompetitorPoz = ["Info", "Value"];
         const tableRowsCompetitorPoz = [["Count positive", this.state.countPozCompetitor], ["Count negative", this.state.countNegCompetitor]]
         doc.autoTable(tableColumnCompetitorPoz, tableRowsCompetitorPoz, {
-            startY: y+160,
+            startY: y + 160,
             tableWidth: 50
         });
-        
-        if(this.state.noProjects>=2)
-        { let y=350
+
+        if (this.state.noProjects >= 2) {
+            let y = 350
             if (y >= pageHeight) {
                 doc.addPage();
                 y = 30
             }
             console.log(pdfs)
             console.log(pdfs.date2)
-           
+
             const tableColumnFeature1 = ["Info", "Value"];
             const tableRowsFeature1 = [["Data collected since ", this.state.date2], ["Tweets of type: retweet", this.state.count_retweets2], ["Tweets of type: text", this.state.count_tweets2], ["Negative Tweets count", this.state.countNeg2], ["Positive tweets count", this.state.countPoz2]]
             const tableColumnTrigger1 = ["Info", "Value"];
@@ -372,17 +425,16 @@ class Board extends React.Component {
             doc.text("Trigger: " + this.state.trigger2, 20, 210);
             doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
         }
-        if(this.state.noProjects===3)
-        {
-            let y=350
+        if (this.state.noProjects === 3) {
+            let y = 350
             if (y >= pageHeight) {
                 doc.addPage();
                 y = 30
             }
             console.log(pdfs)
             console.log(pdfs.date3)
-           
-            
+
+
             const tableColumnFeature1 = ["Info", "Value"];
             const tableRowsFeature1 = [["Data collected since ", this.state.date3], ["Tweets of type: retweet", this.state.count_retweets3], ["Tweets of type: text", this.state.count_tweets3], ["Negative Tweets count", this.state.countNeg3], ["Positive tweets count", this.state.countPoz3]]
             const tableColumnTrigger1 = ["Info", "Value"];
@@ -407,8 +459,8 @@ class Board extends React.Component {
             })
             doc.text("Trigger: " + this.state.trigger3, 20, 210);
             doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
-            
-          
+
+
         }
         doc.save(`report_${dateStr}.pdf`);
     };
@@ -418,6 +470,8 @@ class Board extends React.Component {
     render() {
         console.log("RECEIVED ATTRIBUTES")
         console.log(this.state.projId1)
+        console.log(this.state.noProjects)
+        console.log(this.state.timelineId)
 
         //  this.state.resultedTweets = this.state.tweets1.map(s => ([s]))
         return (
@@ -433,23 +487,15 @@ class Board extends React.Component {
                     </ul>
                 </nav>
                 <div className="inline-charts">
-
-
-                    <div className="vertical">
-
-
-
+                    <div className="vertical" id="board-vertical">
                         <div className="box">
-
-                            <div className="vertical">
-
+                            <div className="vertical" id="board-vertical-inside">
                                 <h1>{this.state.projectName1}</h1>
                                 <hr class="rounded"></hr>
                                 <h2 id="feature">Researched feature: {this.state.feature1}</h2>
                                 <div className="hidden-proj_board1">
-
                                     <TweetEmbed options={{ width: 250 }} id={this.state.max_followers1} />
-                                    <div className="vertical">
+                                    <div className="vertical" id="board-vertical-inside">
                                         <div className="inline-charts">
                                             <Chart
                                                 width={'150px'}
@@ -588,8 +634,8 @@ class Board extends React.Component {
 
                                         <div className="inner-bottom">
                                             <div className="inline-charts">
-                                                <div className="vertical">
-                                                    <div className="inline-charts">
+                                                <div className="vertical" id="board-vertical-inside">
+                                                    <div className="inline-charts" id="inline-charts-trigger">
                                                         <h3 id="trigger-text">Trigger: {this.state.trigger1}</h3>
                                                         <Chart
                                                             width={'500px'}
@@ -630,14 +676,16 @@ class Board extends React.Component {
                                                         </div>
                                                         <div className="vertical">
                                                             <p id="info">Associated hashtags:</p>
-                                                            <h4>{this.state.hashtagTrigger1}</h4>
+                                                            <h4>{this.state.hashtagTrigger1 != '' ? this.state.hashtagTrigger1 : 'No associated hashtags'}</h4>
 
                                                         </div>
 
                                                     </div>
 
                                                 </div>
-                                                <TweetEmbed options={{ width: 250 }} id={this.state.mostRetweetedTrigger1} />
+                                                <div className="tweet-container" >
+                                                    <TweetEmbed options={{ width: 200 }} id={this.state.mostRetweetedTrigger1} />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -690,8 +738,17 @@ class Board extends React.Component {
                             date3={this.state.date3}
                             timeline3={this.state.timeline3}
                             mostRetweetedTrigger3={this.state.mostRetweetedTrigger3} /> : ''}</div>
+                        <div><Account countNegAcc={this.state.countNegAcc} countPozAcc={this.state.countPozAcc}
+                            timelineAccount={this.state.timelineAccount}
+                            mostFollwedAccounts={this.state.mostFollwedAccounts}
+                            hashtagsListAccount={this.state.hashtagsListAccount}
+                            negativeTweets={this.state.negativeTweets}
+                            mostNegativeTweets={this.state.mostNegativeTweets}
+                            username={this.state.username}
+                        ></Account></div>
                         <div>{this.state.competitor ? <Competitor word_sentiment_positive_competitor={this.state.word_sentiment_positive_competitor} word_sentiment_negative_competitor={this.state.word_sentiment_negative_competitor} countPozCompetitor={this.state.countPozCompetitor} countNegCompetitor={this.state.countNegCompetitor}
                             timelineCompetitor={this.state.timelineCompetitor} /> : ''}</div>
+
                     </div>
                     <div className="tweet-Timeline">
                         <TwitterTimelineEmbed

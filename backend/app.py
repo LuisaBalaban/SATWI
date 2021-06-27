@@ -54,7 +54,7 @@ def profileBoard():
     "Content-Type": "application/octet-stream",
     "Content-Disposition": "attachment; filename=foobar.json"}
   if data:
-     cursor.execute("SELECT BoardId, TwitterHandle, Competitor from Boards WHERE ProvidedUserId LIKE %s", [providedUserId])
+     cursor.execute("SELECT BoardId, TwitterHandle, Competitor, Timelineid from Boards WHERE ProvidedUserId LIKE %s", [providedUserId])
      conn.commit()
      data1 = list(cursor.fetchall())
     #  print(data1)
@@ -65,6 +65,7 @@ def profileBoard():
        "name":data[0][0],
        "email":data[0][1],
        "boardId":data1[0][0],
+       "timelineId":data1[0][3],
        "twitterHandle":data1[0][1],
        "competitor":data1[0][2],
        "projects":data2
@@ -124,8 +125,9 @@ def getUserInfo():
   cursor.execute( "select projectId, projectname, feature, triggerfeature from  projects where boardId like %s", [boardId])
   conn.commit()
   data2=list(cursor.fetchall())
+  print(data2)
   for i in range(noProjects):
-    project[i]=[data2[0][4*i], data2[0][4*i+1], data2[0][4*i+2], data2[0][4*i+3]]
+    project[i]=[data2[i][0], data2[i][1], data2[i][2], data2[i][3]]
   userInfo={
     "username":data[0][0],
     "phone":data[0][1],
@@ -155,6 +157,7 @@ def board():
   dates=[]
   projectNames=[]
   projectIds=[]
+  twitterHandle=request.json['username']
   ProvidedUserId=request.json['userId']
   noProjects=request.json['noProjects']
   if noProjects >= 1:
@@ -198,8 +201,9 @@ def board():
   # print(triggers)
   i=0
   BoardId=random.getrandbits(28)
-  valuesUserBoard=(BoardId, ProvidedUserId, competitor, username, ReceiveRecommendations, ReceiveEmails, ReceiveMonthlyReport, len(features))
-  cursor1.execute( "INSERT INTO Boards (BoardId, ProvidedUserId, Competitor, TwitterHandle, ReceiveRecommendations,ReceiveEmails,ReceiveMonthlyReport,  noprojects) VALUES  (%s,%s,%s,%s,%s,%s,%s, %s)", valuesUserBoard)
+  timelineId=random.getrandbits(28)
+  valuesUserBoard=(timelineId,BoardId, ProvidedUserId, competitor, username, ReceiveRecommendations, ReceiveEmails, ReceiveMonthlyReport, len(features))
+  cursor1.execute( "INSERT INTO Boards (timelineId, BoardId, ProvidedUserId, Competitor, TwitterHandle, ReceiveRecommendations,ReceiveEmails,ReceiveMonthlyReport,  noprojects) VALUES  (%s,%s,%s,%s,%s,%s,%s,%s, %s)", valuesUserBoard)
   conn1.commit()
   conn = mysql.connect
   cursor = conn.cursor()
@@ -265,17 +269,43 @@ def board():
         m=m+1
   jsonfeatures['ids']=projectIds;
   jsonfeatures['BoardId']=BoardId;
+  jsonfeatures['timelineId']=timelineId  
+  if twitterHandle:
+    jsonfeatures[twitterHandle]=ComputingData.extractingDataForFeatures(username,'',dates[i],jsonfeatures)
+    x=0
+    for tweet in dict(jsonfeatures[twitterHandle]['labeledTweets']).keys():
+        valuestwitterHandle=(projectIds[0], 
+                       twitterHandle, 
+                       tweet.encode('unicode_escape'), 
+                       dict(jsonfeatures[twitterHandle]['labeledTweetsDETAILED']).get(tweet), 
+                       dict(jsonfeatures[twitterHandle]['labeledTweets']).get(tweet),
+                       round(dict(jsonfeatures[twitterHandle]['labeledTweetsDETAILED']).get(tweet),2),
+                       jsonfeatures[twitterHandle]['retweet_count_list'][x],
+                       jsonfeatures[twitterHandle]['followers_count_list'][x], 
+                       jsonfeatures[twitterHandle]['hashtags'][x],
+                       jsonfeatures[twitterHandle]['timeline'][x],
+                       False, 
+                       jsonfeatures[twitterHandle]['ids'][x],
+                       jsonfeatures[twitterHandle]['tweet_type'][x],
+                       jsonfeatures[twitterHandle]['users'][x])
+        cursor.execute( "insert into FeaturesTweets (ProjectID, Feature, Tweet, DetailedScore, Label, Score, RetweetCount, Followers, Hashtags, CreatedAt, triggerState, TweetId,TweetType,User) values (%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s,%s,%s,%s)", valuestwitterHandle)
+        conn.commit()
+        x=x+1
+
   jsonfeatures=jsonify(jsonfeatures)
   return jsonfeatures
 
 @app.route('/boardStats', methods = ['POST'])
 @cross_origin()
 def boardStats():
+  print("PRINTING REQUEST BODY")
+  print(request.json)
   results={}
   result={}
   features=[]
   projectNames=[]
   triggers=[]
+  twitterHandle=request.json['username']
   noProjects=request.json['noProjects']
   boardsId=request.json['boardsId']
   feature1=request.json['feature1']
@@ -447,11 +477,50 @@ def boardStats():
        "word_pairings_Competitor_Pos":word_pairings_competitor['word_sentiment_positive'],
        "word_pairings_Competitor_Neg":word_pairings_competitor['word_sentiment_negative']
     }
+  countPozAcc=0
+  countNegAcc=0
+  if twitterHandle:
+    cursor.execute("select * from featurestweets where feature like %s", [twitterHandle])
+    conn.commit()
+    data5=list(cursor.fetchall())
+    accountTweets=data5
+    followerPerAccount={}
+    negativeTweets={}
+    mostFollwedAccounts=[]
+    hashtagsListAccount=[]
+    mostNegativeTweets=[]
+    for tweet in accountTweets:
+      if tweet[4]==0:
+       countPozAcc+=1
+      if tweet[4]==1:
+       countNegAcc+=1
+       negativeTweets[str(tweet[12])]=tweet[11]
+      followerPerAccount[tweet[14]]=tweet[6]
+      print(tweet[7])
+      if tweet[7]!='NaN':
+        if tweet[7]!='NULL':
+          if tweet[7]!="b''":
+            hashtagsListAccount.append(tweet[7])
+    mostFollwedAccounts = sorted(followerPerAccount, key=followerPerAccount.get, reverse=True)[:5]
+    mostNegativeTweets = sorted(negativeTweets, key=negativeTweets.get, reverse=True)[:5]
+    print(followerPerAccount)
+    result[twitterHandle]={
+      'mostFollwedAccounts':mostFollwedAccounts,
+      'followerPerAccount':followerPerAccount,
+      'hashtagsListAccount':hashtagsListAccount,
+      'negativeTweets':negativeTweets,
+      'mostNegativeTweets':mostNegativeTweets,
+      'countPozAcc':countPozAcc,
+      'countNegAcc':countNegAcc
+    }
   for i in range(len(projectIds)):
     results[projectIds[i]]={features[i]:result[features[i]],
                             triggers[i]:result[triggers[i]],
-                            competitor:result[competitor]}
+                            competitor:result[competitor],
+                            twitterHandle:result[twitterHandle]}
   return jsonify({"body": results}), 200
+
+
 
 @app.route('/modifyProject', methods = ['POST'])
 @cross_origin()
@@ -470,13 +539,13 @@ def modifyProject():
   data = list(cursor.fetchall())
   if data[0][0]!=projectName1:
     values1=(projectName1, projectid)
-    cursor.execute("UPDATE projects SET projectname LIKE %s WHERE projectid like %s",values1)
+    cursor.execute("UPDATE projects SET projectname = %s WHERE projectid = %s",values1)
     conn.commit()
   print(data[0][1])
   print(feature1)
   if data[0][1]!=feature1:
     values2=(feature1, projectid)
-    cursor.execute("UPDATE projects SET feature LIKE %s WHERE projectid like %s",values2)
+    cursor.execute("UPDATE projects SET feature = %s WHERE projectid = %s",values2)
     conn.commit()
     values3=(projectid,feature1)
     cursor.execute( "delete from featurestweets WHERE ProjectId LIKE %s and feature like %s",values3)
@@ -530,3 +599,56 @@ def modifyProject():
          conn.commit()
          k=k+1;    
   return jsonify({"body": jsonfeatures}), 200
+
+@app.route('/modifyCompetitor', methods = ['POST'])
+@cross_origin()
+def modifyCompetitor():
+  jsonfeatures={}
+  competitor=request.json['competitor']
+  projId=request.json['projId']
+  boardId=request.json['boardId']
+  conn = mysql.connect
+  cursor = conn.cursor()
+  cursor.execute("Select competitor from boards where boardid like %s", [boardId])
+  conn.commit()
+  data = list(cursor.fetchall())
+  if data[0][0]!=competitor:
+    values=(competitor, boardId)
+    cursor.execute("UPDATE boards SET competitor = %s WHERE boardid = %s",values)
+    conn.commit()
+    values1=(projId,competitor)
+    cursor.execute( "delete from featurestweets WHERE projectId LIKE %s and feature like %s",values1)
+    conn.commit()
+    set3=APIcall.creatingTestSet(competitor)
+    preprocessedSearchedTweets3=Preprocess.processTweets(set3)
+    labeledTweets3=SA.loadModel(preprocessedSearchedTweets3)
+    jsonfeatures[competitor]=labeledTweets3
+    m=0
+    for tweet in dict(jsonfeatures[competitor]['labeledTweets'][0]).keys():
+        valuesCompetitor=(projId, dict(jsonfeatures[competitor]['labeledTweetsDETAILED']).get(tweet), competitor, tweet.encode('unicode_escape'), dict(jsonfeatures[competitor]['labeledTweets'][0]).get(tweet),jsonfeatures[competitor]['scores'][m],jsonfeatures[competitor]['timeline'][0][m],jsonfeatures[competitor]['retweet_count_list'][m])
+        cursor.execute( "insert into FeaturesTweets (ProjectID, DetailedScore, Feature, Tweet, Label, Score, CreatedAt, RetweetCount) values (%s,%s,%s,%s,%s,%s,%s, %s)", valuesCompetitor)
+        conn.commit()
+        m=m+1
+  return jsonify({"body": jsonfeatures}), 200
+
+@app.route('/addTimeline', methods = ['POST'])
+@cross_origin()
+def addTimeline():
+  conn = mysql.connect
+  cursor = conn.cursor()
+  Timestamp=request.json['date']
+  countNeg=request.json['countNeg']
+  countPoz=request.json['countPoz']
+  timelineId=request.json['timelineId']
+  values=(countPoz, countNeg, timelineId)
+  cursor.execute( "insert into Timeline (countPositive, countNegative,timelineid) values (%s,%s,%s)", values)
+  conn.commit()
+  cursor.execute("Select Timestamp, countNegative, countPositive from timeline where timelineid like %s", [timelineId])
+  conn.commit()
+  data = list(cursor.fetchall())
+  print(data)
+  return jsonify({"body": data}), 200
+
+
+  
+  

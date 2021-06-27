@@ -75,6 +75,7 @@ def computeDataForFeature(labeledTweets, set):
            "word_sentiment_negative":word_pairings['word_sentiment_negative'],
            "polarity":word_pairings['added_polarity'],
            "bubble_chart_data":word_pairings['bubble_chart_data'],
+           "users":set['users']
    }
    return data
 

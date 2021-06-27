@@ -37,3 +37,13 @@
 {
   z-index:-1;
 }
+#modal-button
+{
+  float: right;
+  margin-right: 20px;
+  margin-top: 20px;
+}
+.modal-container
+{
+  width: -webkit-fill-available;
+}

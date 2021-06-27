@@ -122,3 +122,21 @@ ADD profilePic VARCHAR(500);
 
 ALTER TABLE boards
 Add noprojects INT(3);
+
+ALTER TABLE FeaturesTweets
+Add user varchar(50);
+
+ALTER TABLE projects
+Add countPositive varchar(50);
+
+
+
+ALTER TABLE boards
+Add timelineId BIGINT;
+
+CREATE TABLE Timeline (
+    timelineId BIGINT NOT NULL,
+    Timestamp TIMESTAMP,
+    countPositive int(4),
+    countNegative int(5)
+);

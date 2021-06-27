@@ -52,10 +52,11 @@ class UserProfile extends React.Component {
             max_followers1: 0,
             mostRetweetedTrigger1: '',
             timeline1: [],
-      
+            projectNo: 0
+
 
         }
-        this.exportProject1 = this.exportProject1.bind(this)
+        this.exportProject = this.exportProject.bind(this)
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
         this.goBack = this.goBack.bind(this)
@@ -91,7 +92,7 @@ class UserProfile extends React.Component {
                     ReceiveEmails: json.body["ReceiveEmails"],
                     ReceiveMonthlyReport: json.body["ReceiveMonthlyReport"],
                     competitor: json.body["competitor"],
-                    boardid: json.body["boardid"],
+                    boardsId: json.body["boardid"],
                     projects: json.body["projects"],
                     projectName1: json.body["projects"][0][1],
                     feature1: json.body["projects"][0][2],
@@ -106,15 +107,18 @@ class UserProfile extends React.Component {
                     feature3: json.body["projects"][2] ? json.body["projects"][2][2] : '',
                     trigger2: json.body["projects"][1] ? json.body["projects"][1][3] : '',
                     trigger3: json.body["projects"][2] ? json.body["projects"][2][3] : '',
-                   
+
                 })
             })
     }
 
 
-    showModal = () => {
-        this.setState({ show: true });
-        console.log(this.state.show)
+    showModal = (e) => {
+        this.setState({
+            show: true,
+            projectNo: e.target.value
+        });
+        console.log(this.state.projectNo)
     };
 
     hideModal = () => {
@@ -167,19 +171,21 @@ class UserProfile extends React.Component {
     handleChangeReceiveEmails() {
         this.setState({ ReceiveEmails: !this.state.ReceiveEmails });
     }
-    exportProject1 = () => {
+    exportProject = (e) => {
+        console.log(e.target.value)
+        const proj = e.target.value
         console.log("making db request")
         console.log(this.state.projId1)
         fetch("http://127.0.0.1:5000/boardStats", {
             method: "POST",
             body: JSON.stringify({
-                projId1: this.state.projId1,
-                noProjects: this.state.noProjects,
+                projId1: e.target.value > 1 ? e.target.value > 2 ? this.state.projId3 : this.state.projId2 : this.state.projId1,
+                noProjects: 1,
                 boardsId: this.state.boardsId,
-                feature1: this.state.feature1,
-                trigger1: this.state.trigger1,
+                feature1: e.target.value > 1 ? e.target.value > 2 ? this.state.feature3 : this.state.feature2 : this.state.feature1,
+                trigger1: e.target.value > 1 ? e.target.value > 2 ? this.state.trigger3 : this.state.trigger2 : this.state.trigger1,
                 competitor: this.state.competitor,
-                projectName1: this.state.projectName1,
+                projectName1: e.target.value > 1 ? e.target.value > 2 ? this.state.projectName3 : this.state.projectName2 : this.state.projectName1,
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -192,21 +198,43 @@ class UserProfile extends React.Component {
         })
             .then(json => {
                 console.log(json);
+                let projectTrigger;
+                let projectId;
+                let projFeature;
+                let projectName;
+                if (proj > 1) {
+                    projectId = this.state.projId2
+                    projectTrigger = this.state.trigger2
+                    projFeature = this.state.feature2
+                    projectName = this.state.projectName2
+                    if (proj > 2) {
+                        projectId = this.state.projId3
+                        projectTrigger = this.state.trigger3
+                        projFeature = this.state.feature3
+                        projectName = this.state.projectNa3
+                    }
+                }
+                else {
+                    projectId = this.state.projId1
+                    projectTrigger = this.state.trigger1
+                    projFeature = this.state.feature1
+                    projectName = this.state.projectName1
+                }
                 this.setState({
-                    avgPolarityTrigger1: json.body[this.state.projId1][this.state.trigger1].averageTriggerPolarity,
-                    bubble_chart_data1: json.body[this.state.projId1][this.state.feature1].bubble_chart_data,
-                    hashtagTrigger1: json.body[this.state.projId1][this.state.trigger1].hashtagsTrigger,
-                    polarityValues1: json.body[this.state.projId1][this.state.feature1].polarityVals,
-                    word_sentiment_negative_competitor: json.body[this.state.projId1].word_sentiment_negative,
-                    word_sentiment_positive_competitor: json.body[this.state.projId1].word_sentiment_positive,
-                    countPoz1: json.body[this.state.projId1][this.state.feature1].countPoz,
-                    countNeg1: json.body[this.state.projId1][this.state.feature1].countNeg,
-                    count_retweets1: (JSON.stringify(json.body[this.state.projId1][this.state.feature1].tweetType).match(/retweet/g) || []).length,
-                    count_tweets1: (JSON.stringify(json.body[this.state.projId1][this.state.feature1].tweetType).match(/text/g) || []).length,
-                    impactedFollowersTrigger1: json.body[this.state.projId1][this.state.trigger1].allFollowersTrigger,
-                    max_followers1: (json.body[this.state.projId1][this.state.trigger1].mostPopularUserTrigger).toString(),
-                    mostRetweetedTrigger1: (json.body[this.state.projId1][this.state.trigger1].mostPopularUserTrigger).toString(),
-                    timeline1: json.body[this.state.projId1][this.state.trigger1].timeline,
+                    avgPolarityTrigger1: json.body[projectId][projectTrigger].averageTriggerPolarity,
+                    bubble_chart_data1: json.body[projectId][projFeature].bubble_chart_data,
+                    hashtagTrigger1: json.body[projectId][projectTrigger].hashtagsTrigger,
+                    polarityValues1: json.body[projectId][projFeature].polarityVals,
+                    word_sentiment_negative_competitor: json.body[projectId].word_sentiment_negative,
+                    word_sentiment_positive_competitor: json.body[projectId].word_sentiment_positive,
+                    countPoz1: json.body[projectId][projFeature].countPoz,
+                    countNeg1: json.body[projectId][projFeature].countNeg,
+                    count_retweets1: (JSON.stringify(json.body[projectId][projFeature].tweetType).match(/retweet/g) || []).length,
+                    count_tweets1: (JSON.stringify(json.body[projectId][projFeature].tweetType).match(/text/g) || []).length,
+                    impactedFollowersTrigger1: json.body[projectId][projectTrigger].allFollowersTrigger,
+                    max_followers1: (json.body[projectId][projectTrigger].mostPopularUserTrigger).toString(),
+                    mostRetweetedTrigger1: (json.body[projectId][projectTrigger].mostPopularUserTrigger).toString(),
+                    timeline1: json.body[projectId][projectTrigger].timeline,
 
                 }, function () {
                     const doc = new jsPDF();
@@ -217,8 +245,8 @@ class UserProfile extends React.Component {
                     const date = Date().split(" ");
                     const dateStr = date[0] + date[1] + date[2] + date[3] + date[4];
                     doc.text("General report", 14, 15);
-                    doc.text("Project 1. " + this.state.projectName1, 20, 25);
-                    doc.text("Feature " + this.state.feature1, 20, 35);
+                    doc.text("Project 1. " + projectName, 20, 25);
+                    doc.text("Feature " + projFeature, 20, 35);
                     doc.autoTable(tableColumnFeature1, tableRowsFeature1, { startY: 40 });
                     doc.setFont("helvetica");
                     doc.setFontSize(9);
@@ -234,7 +262,7 @@ class UserProfile extends React.Component {
                         startY: 110,
                         tableWidth: 100
                     })
-                    doc.text("Trigger: " + this.state.trigger1, 20, 210);
+                    doc.text("Trigger: " + projectTrigger, 20, 210);
                     doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
 
                     doc.save(`report_${dateStr}.pdf`);
@@ -256,29 +284,58 @@ class UserProfile extends React.Component {
         console.log(this.state.projId1)
         console.log(this.state.bubble_chart_data1)
         console.log(this.state.loadedData)
+
+        console.log(this.state.noProjects)
         return (
-            <div>
+            <div classname="body-board">
                 <h1 id="small-title">{this.state.username}'s account</h1>
 
 
                 <section>
                     <div className="vertical" id="container-projects">
-                        <Modal show={this.state.show} handleClose={this.hideModal} projectName1={this.state.projectName1}
-                            feature1={this.state.feature1}
-                            trigger1={this.state.trigger1}
-                            projId1={this.state.projId1}
-                            userId={this.state.userId}
-                            TwitterHandle={this.state.TwitterHandle}>
-                            <p>Modal</p>
-                        </Modal>
-                        <div id="display-project"  ></div>
-                        <h3>Competitor:<i> {this.state.competitor}</i></h3>
-
+                        <div>{this.state.projectNo > 1 ? this.state.projectNo > 2 ? this.state.projectNo == 5 ?
+                            <Modal
+                                show={this.state.show} handleClose={this.hideModal}
+                                competitor={this.state.competitor}
+                                boardId={this.state.boardsId}
+                                projId={this.state.projId1}
+                                TwitterHandle={this.state.TwitterHandle} /> :
+                            <Modal
+                                projectNo={this.state.projectNo} show={this.state.show} handleClose={this.hideModal}
+                                boardId={this.state.boardsId}
+                                projectName={this.state.projectName3}
+                                feature={this.state.feature3}
+                                trigger={this.state.trigger3}
+                                userId={this.state.userId}
+                                projId={this.state.projId3}
+                                TwitterHandle={this.state.TwitterHandle} /> :
+                            <Modal projectNo={this.state.projectNo} show={this.state.show} handleClose={this.hideModal}
+                                projectName={this.state.projectName2}
+                                feature={this.state.feature2}
+                                trigger={this.state.trigger2}
+                                boardId={this.state.boardsId}
+                                userId={this.state.userId}
+                                projId={this.state.projId2}
+                                TwitterHandle={this.state.TwitterHandle} /> :
+                            <Modal projectNo={this.state.projectNo} show={this.state.show} handleClose={this.hideModal}
+                                projectName={this.state.projectName1}
+                                feature={this.state.feature1}
+                                boardId={this.state.boardsId}
+                                trigger={this.state.trigger1}
+                                userId={this.state.userId}
+                                projId={this.state.projId1}
+                                TwitterHandle={this.state.TwitterHandle} />}
+                        </div>
+                        <div id="display-project"  >
+                            <h3>Competitor:<i> {this.state.competitor}</i><button className="profile-button" type="button" value="5" id="button-competitor" onClick={this.showModal}>
+                                Modify
+                            </button></h3>
+                        </div>
                         <h3>Notifications</h3>
-                        <div class="containerCheckBoxes">
+                        <div>
                             <ul class="ks-cboxtags">
-                                <li><input type="checkbox" id="checkboxTwo" value="ReceiveEmails" checked={this.state.ReceiveEmails} onChange={this.handleChangeReceiveEmails} /><label for="checkboxTwo"></label><p>  Receive emails</p></li>
-                                <li><input type="checkbox" id="checkboxThree" value="monthlyReport" checked={this.state.monthlyReport} onChange={this.ReceiveMonthlyReport} /><label for="checkboxThree"></label><p>  Autogenerated monthly report</p></li>
+                                <li><input type="checkbox" value="ReceiveEmails" checked={this.state.ReceiveEmails} onChange={this.handleChangeReceiveEmails} /><label for="checkboxTwo"></label><p>  Receive emails</p></li>
+                                <li><input type="checkbox" value="monthlyReport" checked={this.state.monthlyReport} onChange={this.ReceiveMonthlyReport} /><label for="checkboxThree"></label><p>  Autogenerated monthly report</p></li>
                             </ul>
                             <button class="buttonSpecial" onClick={this.goBack}><img id="left-arrow" src={leftArrowSmall} /></button>
                         </div>
@@ -291,41 +348,41 @@ class UserProfile extends React.Component {
                                 <p>Feature: <b><i>{this.state.feature1}</i></b></p>
                                 <p>Trigger: <b><i>{this.state.trigger1}</i></b></p>
                             </div>
-                            <button className="profile-button" type="button" onClick={this.showModal}>
+                            <button className="profile-button" type="button" value="1" onClick={this.showModal}>
                                 Modify project
                             </button>
-                            <button className="profile-button" onClick={this.exportProject1}>Export report</button>
+                            <button className="profile-button" value="1" onClick={this.exportProject}>Export report</button>
                         </div>
-                        {this.state.noProjects >= 5 ?
+                        {this.state.noProjects >= 2 ?
                             <div id="container-profile">
                                 <div id="display-project" >
-                                <div id="project-left">
-                                    <h3>2. {this.state.projectName2}</h3>
-                                    <p>Feature: <b>{this.state.feature2}</b></p>
-                                    <p>Trigger: <b>{this.state.trigger2}</b></p>
+                                    <div id="project-left">
+                                        <h3>2. {this.state.projectName2}</h3>
+                                        <p>Feature: <b>{this.state.feature2}</b></p>
+                                        <p>Trigger: <b>{this.state.trigger2}</b></p>
                                     </div>
-                                    <button className="profile-button" type="button" onClick={this.showModal}>
-                                    Modify project
-                                </button>
-                                <button className="profile-button" onClick={this.exportProject2}>Export report</button>
+                                    <button className="profile-button" type="button" value="2" onClick={this.showModal}>
+                                        Modify project
+                                    </button>
+                                    <button className="profile-button" value="2" onClick={this.exportProject}>Export report</button>
                                 </div>
-                               
+
                             </div>
                             : ""}
-                       {this.state.noProjects == 3 ?
+                        {this.state.noProjects == 3 ?
                             <div id="container-profile">
                                 <div id="display-project" >
-                                <div id="project-left">
-                                    <h3>3. {this.state.projectName3}</h3>
-                                    <p>Feature: <b>{this.state.feature3}</b></p>
-                                    <p>Trigger: <b>{this.state.trigger3}</b></p>
+                                    <div id="project-left">
+                                        <h3>3. {this.state.projectName3}</h3>
+                                        <p>Feature: <b>{this.state.feature3}</b></p>
+                                        <p>Trigger: <b>{this.state.trigger3}</b></p>
                                     </div>
-                                    <button className="profile-button" type="button" onClick={this.showModal}>
-                                    Modify project
-                                </button>
-                                <button className="profile-button" onClick={this.exportProject3}>Export report</button>
+                                    <button className="profile-button" type="button" value="3" onClick={this.showModal}>
+                                        Modify project
+                                    </button>
+                                    <button className="profile-button" value="3" onClick={this.exportProject}>Export report</button>
                                 </div>
-                               
+
                             </div>
                             : ""}
 

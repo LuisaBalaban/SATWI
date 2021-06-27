@@ -35,7 +35,8 @@ class BoardConfig extends React.Component {
             receiveEmails: false,
             personalizedRecommandations: false,
             monthlyReport: false,
-            noProjects: ''
+            noProjects: '',
+            timelineId:0
 
 
         }
@@ -169,6 +170,8 @@ class BoardConfig extends React.Component {
                 console.log(Object.values(json[this.state.feature1].results[2][1]))
                 console.log(Object.values(json[this.state.feature1].labeledTweets))
 
+                console.log(json['timelineId'])
+
                 let path = `/board`;
                 this.props.history.push({
                     pathname: path,
@@ -197,7 +200,8 @@ class BoardConfig extends React.Component {
                         boardsId:json['BoardId'],
                         profilePic:this.state.profilePic,
                         email:this.state.email,
-                        name:this.state.name
+                        name:this.state.name,
+                        timelineId:json['timelineId']
 
                     }
                 });

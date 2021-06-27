@@ -19,8 +19,9 @@ def creatingTestSet(searched_keyword):
     hashtags_pairing_id={}
     tweet_followers=[]
     result=[]
+    users=[]
     for tweet_info in tweepy.Cursor(api.search, q=searched_keyword,rpp=30, lang="en", tweet_mode='extended', type='popular').items(30):
-        tweet_information=extractTweetData(tweet_info,created_at,ids,tweetType,retweet_count_dict, followers_count_list,hashtags_pairing_id,tweet_followers, hashtags)
+        tweet_information=extractTweetData(tweet_info,created_at,ids,tweetType,retweet_count_dict, followers_count_list,hashtags_pairing_id,tweet_followers, hashtags,users)
         if 'retweeted_status' in dir(tweet_info):
             tweet=tweet_info.retweeted_status.full_text
         else: 
@@ -42,9 +43,10 @@ def count():
  count.append(count_tw); 
  return count;
 
-def extractTweetData(tweet_info, created_at,ids,tweetType,retweet_count_dict, followers_count_list, hashtags_pairing_id,tweet_followers,hashtags):
+def extractTweetData(tweet_info, created_at,ids,tweetType,retweet_count_dict, followers_count_list, hashtags_pairing_id,tweet_followers,hashtags, users):
     print(tweet_info.created_at)
     created_at.append(tweet_info.created_at)
+    users.append(tweet_info.user.screen_name)
     ids.append(tweet_info.id)
     if 'retweeted_status' in dir(tweet_info):
             tweet=tweet_info.retweeted_status.full_text
@@ -68,6 +70,7 @@ def extractTweetData(tweet_info, created_at,ids,tweetType,retweet_count_dict, fo
                 "followers_count_list":followers_count_list,
                 "hashtags_pairing_id":hashtags_pairing_id,
                 "ids":ids  ,
-                "hashtags":hashtags    
+                "hashtags":hashtags,
+                "users":users  
                 }
     return tweet_info

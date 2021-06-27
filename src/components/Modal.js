@@ -9,12 +9,15 @@ class Modal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            projectName1: "",
-            feature1: "",
-            trigger1: "",
+            projectName: "",
+            feature: "",
+            trigger: "",
             show: false,
             userId:'',
-            TwitterHandle:''
+            TwitterHandle:'',
+            projectNo:0,
+            boardId:'',
+            competitor:''
 
         }
         this.hideModal=this.hideModal.bind(this);
@@ -30,43 +33,70 @@ class Modal extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({
-            projectName1: nextProps.projectName1,
-            feature1: nextProps.feature1,
-            trigger1: nextProps.trigger1,
+            projectName: nextProps.projectName,
+            feature: nextProps.feature,
+            trigger: nextProps.trigger,
             show: nextProps.show,
             handleClose: nextProps.handleClose,
             children: this.state.show ? " " : "modal display-none",
             showHideClassName: this.state.show ? "modal display-block" : "modal display-none",
             userId:nextProps.userId,
-            projId1:nextProps.projId1,
+            projId:nextProps.projId,
             TwitterHandle:nextProps.TwitterHandle,
-            
+            projectNo:nextProps.projectNo,
+            boardId:nextProps.boardId,
+            competitor:nextProps.competitor
 
         })
+        console.log(nextProps)
     }
     hideModal = () => {
-        this.setState({ show: false ,
-            children: this.state.show ? " " : "modal display-none",
-            showHideClassName: this.state.show ? "modal display-block" : "modal display-none"});
+        this.setState({
+            show:false,
+            children: this.state.show ? "" : "modal display-none",
+            showHideClassName: this.state.show ? "" : "modal display-none",});
+            
         console.log(this.state.show)
     };
     render() {
+        console.log(this.state.boardId)
         console.log(this.state.show)
-        console.log(this.state.projectName1)
+        console.log(this.state.projectName)
+        console.log(this.state.projectNo)
         return (
             <div className={this.state.showHideClassName}>
+                {this.state.show?
                 <section className="modal-main">
                     {this.state.children}
-                    <Form projectName1={this.state.projectName1}
-                        feature1={this.state.feature1}
-                        trigger1={this.state.trigger1}
-                        userId={this.state.userId}
-                        projId1={this.state.projId1} 
-                        TwitterHandle={this.state.TwitterHandle}/>
-              
-                    <button type="button" id="modal-button" onClick={this.hideModal} > Close
+                   {this.state.projectNo<5?
+                   <div className="modal-container">
+                         <button type="button" id="modal-button" onClick={this.hideModal} > Close
                     </button>
+                    <Form
+                    projectNo={this.state.projectNo}
+                    projectName={this.state.projectName}
+                        feature={this.state.feature}
+                        trigger={this.state.trigger}
+                        userId={this.state.userId}
+                        projId={this.state.projId} 
+                        boardId={this.state.boardId}
+                        TwitterHandle={this.state.TwitterHandle}/> 
+                   
+                    </div> : 
+                     <div  className="modal-container"> 
+                     <button type="button" id="modal-button" onClick={this.hideModal} > Close
+                </button>
+                     <Form
+                         userId={this.state.userId}
+                         projectNo={this.state.projectNo}
+                         projId={this.state.projId} 
+                         competitor={this.state.competitor}
+                         boardId={this.state.boardId}
+                         TwitterHandle={this.state.TwitterHandle}/> 
+                   
+                     </div>}
                 </section>
+                : ''}
             </div>
         );
     }
