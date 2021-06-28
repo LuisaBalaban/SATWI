@@ -1270,3 +1270,12 @@ font-family: Reem Kufi;
 {
   margin-top: 0;
 }
+#center-elem
+{
+  text-align: center;
+  margin-top: 20px;
+}
+#containerCheckBoxes{
+  font-size: -webkit-xxx-large;
+  font-family: Reem kufi;
+}

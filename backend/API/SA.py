@@ -53,11 +53,14 @@ def loadModel(preprocessedSearchedTweets):
     #print(word)
     for word_frq in APIcall.rt_paired_freq.keys():
       if word.lower()==word_frq.lower():
+        try:
          polarity=labeledTweetsDETAILED[tweet]
          if word_frq in added_polarity:
           added_polarity[word]=polarity+added_polarity[word_frq]
          else:
           added_polarity[word]=polarity
+        except:
+          print("error")
     added_polarity[word]=polarity/APIcall.rt_paired_freq[word_frq][1]
  tuples=list(zip(preprocessedSearchedTweets,results))
  df = pd.DataFrame(tuples, columns=['Tweet','results'])

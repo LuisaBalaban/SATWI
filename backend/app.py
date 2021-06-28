@@ -8,11 +8,16 @@ from API import Preprocess
 from API import SA 
 from API import ComputingData
 import json
+from API import Connect
 import random
 from flask_cors import CORS, cross_origin
 from flask_mysqldb import MySQL
 import pandas as pd
+import sys
+
 thread = None
+SatwiEmail=Connect.SatwiEmail
+SatwiPassword=Connect.SatwiPassword
 app = Flask(__name__, template_folder="components")
 app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app)
@@ -21,17 +26,19 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] =  'pass'
 app.config['MYSQL_DB'] = 'satwidb'
 mysql=MySQL(app)
+from flask_mail import Mail, Message
 
-    
+app.debug = True
+   
 @app.route('/result', methods = ['POST'])
 @cross_origin()
 def result():
   keyword = request.json['keyword']
   newSet=APIcall.creatingTestSet(keyword)
   preprocessedSearchedTweets=Preprocess.processTweets(newSet)
-  print(preprocessedSearchedTweets)
+  # print(preprocessedSearchedTweets)
   labeledTweets=SA.loadModel(preprocessedSearchedTweets)
-  print(type(labeledTweets))
+  # print(type(labeledTweets))
   labeledTweets=jsonify(labeledTweets)
   return labeledTweets
 
@@ -49,7 +56,7 @@ def profileBoard():
   cursor.execute("SELECT Name, Email from USERS WHERE ProvidedUserId LIKE %s", [providedUserId])
   conn.commit()
   data = list(cursor.fetchall())
-  print(data)
+  # print(data)
   headers = {
     "Content-Type": "application/octet-stream",
     "Content-Disposition": "attachment; filename=foobar.json"}
@@ -111,7 +118,7 @@ def getUserInfo():
   conn = mysql.connect
   cursor = conn.cursor()
   ProvidedUserId=request.json['userId']
-  print(ProvidedUserId)
+  # print(ProvidedUserId)
   cursor.execute( "select Username,phone,email,name,createdat, profilepic from users where ProvidedUserId like %s", [ProvidedUserId])
   conn.commit()
   data = list(cursor.fetchall())
@@ -294,6 +301,8 @@ def board():
 
   jsonfeatures=jsonify(jsonfeatures)
   return jsonfeatures
+
+
 
 @app.route('/boardStats', methods = ['POST'])
 @cross_origin()
@@ -495,15 +504,16 @@ def boardStats():
       if tweet[4]==1:
        countNegAcc+=1
        negativeTweets[str(tweet[12])]=tweet[11]
-      followerPerAccount[tweet[14]]=tweet[6]
+      if tweet[14]:
+       followerPerAccount[tweet[14]]=tweet[6]
       print(tweet[7])
       if tweet[7]!='NaN':
         if tweet[7]!='NULL':
           if tweet[7]!="b''":
             hashtagsListAccount.append(tweet[7])
+    print(followerPerAccount)
     mostFollwedAccounts = sorted(followerPerAccount, key=followerPerAccount.get, reverse=True)[:5]
     mostNegativeTweets = sorted(negativeTweets, key=negativeTweets.get, reverse=True)[:5]
-    print(followerPerAccount)
     result[twitterHandle]={
       'mostFollwedAccounts':mostFollwedAccounts,
       'followerPerAccount':followerPerAccount,
@@ -649,6 +659,35 @@ def addTimeline():
   print(data)
   return jsonify({"body": data}), 200
 
-
+# app.config['EXPLAIN_TEMPLATE_LOADING'] = True
   
-  
+@app.route('/sendWelcomeEmail', methods = ['POST'])
+@cross_origin()
+def sendWelcomeEmail():
+  print("SENDING EMAIL")
+  print(request.json)
+  username=request.json['name']
+  twitterHandle=request.json['twitterHandle']
+  email=request.json['email']
+  print(email)
+  phone=request.json['phone']
+  app.config.update(
+	DEBUG=True,
+	MAIL_SERVER='smtp.gmail.com',
+	MAIL_PORT=465,
+	MAIL_USE_SSL=True,
+	MAIL_USERNAME = SatwiEmail,
+	MAIL_PASSWORD = SatwiPassword
+	)
+  mail = Mail(app)
+  try:
+    msg = Message("Welcome to SATWI!",
+	  sender=SatwiEmail,
+	  recipients=[email])
+    msg.body = username+"thank you for choosing SATWI!\nThis e-mail has been associated with a SATWI account.Here are your account details:\n Name: " +username+" Phone number: "+phone;
+    msg.html =render_template("welcome-message.html", twitterHandle=twitterHandle, username=username, phone=phone)
+    mail.send(msg)
+    return 'Mail sent!'
+  except Exception:
+     print("Unexpected error:", sys.exc_info()[0])
+     return 'error'

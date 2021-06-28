@@ -2,13 +2,16 @@ import '../index.css';
 import React from 'react';
 import GoogleLogin from 'react-google-login'
 import { withRouter } from 'react-router-dom';
+import PhoneInput from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
 
 class Login extends React.Component {
   constructor() {
     super();
     this.state = {
-      noPhone: ''
+
     }
+    
     this.handleChange = this.handleChange.bind(this)
   }
 
@@ -24,7 +27,7 @@ class Login extends React.Component {
       method: "POST",
       body: JSON.stringify({
         profile: response.profileObj,
-        phone:this.state.noPhone
+        phone: this.state.noPhone
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -34,16 +37,16 @@ class Login extends React.Component {
 
     ).then(res => {
       console.log(res)
-      console.log(this.state.phone)
+      console.log(this.state.noPhone)
       if (res.status == 200) {
         this.props.history.push({
           pathname: '/board-config',
           state: {
-            username: response.profileObj['username'],
+            name: response.profileObj['name'],
             userId: response.profileObj['googleId'],
             email: response.profileObj['email'],
             profilePic: response.profileObj['imageUrl'],
-            phone:this.state.noPhone
+            phone: this.state.noPhone
           }
         })
       }
@@ -53,6 +56,7 @@ class Login extends React.Component {
 
   }
   render() {
+    console.log(this.state.noPhone)
     return (<div className="google-button">
       <div class='container'>
         <div class='window'>
@@ -60,7 +64,13 @@ class Login extends React.Component {
             <div class='welcome'>Welcome!</div>
             <div class='subtitle'>Get ready to dive in your Twitter data</div>
             <div class='input-fields'>
-              <input type='text' placeholder='Phone' defaultValue={this.state.noPhone} onChange={this.handleChange} class='input-line full-width'></input>
+              {/* <input type='tel' name='noPhone' placeholder='Phone' defaultValue={this.state.noPhone} onChange={this.handleChange} pattern="+[0-9]{11}" class='input-line full-width'></input> */}
+              <PhoneInput
+              
+                placeholder="Enter phone number"
+                value={ this.state.noPhone}
+                onChange={noPhone => this.setState({ noPhone })} />
+                <div id="center-elem">
               <GoogleLogin
                 clientId="332583792653-4sev4321k5ssjukodjmmbbmot21daq12.apps.googleusercontent.com"
                 buttonText="Register with Google"
@@ -68,6 +78,7 @@ class Login extends React.Component {
                 onFailure={this.responseGoogle}
                 cookiePolicy={'single_host_origin'}
               />
+              </div>
             </div>
           </div>
         </div>
