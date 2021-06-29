@@ -1,3 +1,4 @@
+from MySQLdb.cursors import RE_INSERT_VALUES
 from flask import Flask, jsonify, render_template
 from threading import Thread
 from flask import request
@@ -14,6 +15,9 @@ from flask_cors import CORS, cross_origin
 from flask_mysqldb import MySQL
 import pandas as pd
 import sys
+# import requests
+# from redis import Redis
+# from rq import Queue
 
 thread = None
 SatwiEmail=Connect.SatwiEmail
@@ -27,9 +31,17 @@ app.config['MYSQL_PASSWORD'] =  'pass'
 app.config['MYSQL_DB'] = 'satwidb'
 mysql=MySQL(app)
 from flask_mail import Mail, Message
-
 app.debug = True
-   
+app.config.update(
+	DEBUG=True,
+	MAIL_SERVER='smtp.gmail.com',
+	MAIL_PORT=465,
+	MAIL_USE_SSL=True,
+	MAIL_USERNAME = SatwiEmail,
+	MAIL_PASSWORD = SatwiPassword
+	)
+mail = Mail(app)
+
 @app.route('/result', methods = ['POST'])
 @cross_origin()
 def result():
@@ -671,15 +683,6 @@ def sendWelcomeEmail():
   email=request.json['email']
   print(email)
   phone=request.json['phone']
-  app.config.update(
-	DEBUG=True,
-	MAIL_SERVER='smtp.gmail.com',
-	MAIL_PORT=465,
-	MAIL_USE_SSL=True,
-	MAIL_USERNAME = SatwiEmail,
-	MAIL_PASSWORD = SatwiPassword
-	)
-  mail = Mail(app)
   try:
     msg = Message("Welcome to SATWI!",
 	  sender=SatwiEmail,
@@ -691,3 +694,63 @@ def sendWelcomeEmail():
   except Exception:
      print("Unexpected error:", sys.exc_info()[0])
      return 'error'
+   
+
+def send_monthly_email(twitterHandle,email):
+  print("SENDING MONTHLY  EMAIL")
+  values=boardStats()
+  username=data['name']
+  email=data['email']
+  countPoz=data['countPoz']
+  countNeg=data['countNeg']
+  print(email)
+  try:
+    msg = Message("Welcome to SATWI!",
+	  sender=SatwiEmail,
+	  recipients=[email])
+    # msg.body = username+"thank you for choosing SATWI!\nThis e-mail has been associated with a SATWI account.Here are your account details:\n Name: " +username+" Phone number: "+phone;
+    totalTweets=countPoz+countPoz
+    piechart="https://image-charts.com/chart?chan=1500%2CeaseOutBounce&chd=t%3A"+countPoz+ "%2C"+countNeg+"&chf=b0%2Clg%2C90%2C68cefd%2C0%2C96a6ff%2C1&chl=Negative%7CPositive&chli="+totalTweets+"&chs=500x300&cht=pd&chtt=Sentiment%20polarity%20distribution"
+    msg.html =render_template("monthly-report.html", twitterHandle=twitterHandle, username=username, piechart=piechart)
+    mail.send(msg)
+    return 'Mail sent!'
+  except Exception:
+     print("Unexpected error:", sys.exc_info()[0])
+     return 'error'
+
+# @app.route('/sendMonthlyEmail', methods = ['POST'])
+# @cross_origin()
+# def sendMonthlyEmail():
+#   date=request.json['date']
+#   state=request.json['state']
+#   email=request.json['email']
+#   twitterHandle=request.json['twitterHandle']
+#   if state:
+#     queue = Queue(connection=Redis())
+#     queue.enqueue_at(date, send_monthly_email(twitterHandle,email))
+@app.route('/sendNoticeEmail', methods = ['POST'])
+@cross_origin()
+def sendNoticeEmail():
+  print("SENDING EMAIL NOTICE")
+  print(request.json)
+  twitterHandle=request.json['twitterHandle']
+  email=request.json['email']
+  countPoz=request.json['countPozAcc']
+  countNeg=request.json['countNegAcc']
+  print(email)
+  try:
+    msg = Message("SATWI Notice - increased negativity",
+	  sender=SatwiEmail,
+	  recipients=[email])
+    msg.body = "You are receiving this report because you opted for notifications in your account details"
+    totalTweets=countPoz+countPoz
+    piechart="https://image-charts.com/chart?chan=1500%2CeaseOutBounce&chd=t%3A"+str(countPoz)+ "%2C"+str(countNeg)+"&chf=b0%2Clg%2C90%2C68cefd%2C0%2C96a6ff%2C1&chl=Negative%7CPositive&chli="+str(totalTweets)+"&chs=300x300&cht=pd"
+    print(piechart)
+    msg.html =render_template("notice-message.html", twitterHandle=twitterHandle,piechart=piechart)
+    mail.send(msg)
+    return 'Mail sent!'
+  except Exception:
+     print("Unexpected error:", sys.exc_info()[0])
+     return 'error'
+  
+

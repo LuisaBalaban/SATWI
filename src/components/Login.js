@@ -64,9 +64,7 @@ class Login extends React.Component {
             <div class='welcome'>Welcome!</div>
             <div class='subtitle'>Get ready to dive in your Twitter data</div>
             <div class='input-fields'>
-              {/* <input type='tel' name='noPhone' placeholder='Phone' defaultValue={this.state.noPhone} onChange={this.handleChange} pattern="+[0-9]{11}" class='input-line full-width'></input> */}
               <PhoneInput
-              
                 placeholder="Enter phone number"
                 value={ this.state.noPhone}
                 onChange={noPhone => this.setState({ noPhone })} />

@@ -21,6 +21,7 @@ class Board extends React.Component {
         this.state = {
             exportpdf: false,
             fetchedData: false,
+            mailTimeStamp:new Date(),
             userId: this.props.location.state.userId,
             isLogin: this.props.location.state.isLogin,
             username: this.props.location.state.username,
@@ -254,6 +255,7 @@ class Board extends React.Component {
                     countNegAcc: json.body[this.state.projId1][this.state.username].countNegAcc,
                     // timelineAccount:this.state.timelineAccount.concat(new Date(),  json.body[this.state.projId1][this.state.username].countPozAcc, json.body[this.state.projId1][this.state.username].countNegAcc),
                     // timelineId:json.body['timelineId']
+         
 
                 })
                 // this.setState(previousState => ({
@@ -267,10 +269,42 @@ class Board extends React.Component {
             })
     }
 
+    sendNoticeMail()
+    {
+        fetch("http://127.0.0.1:5000/sendNoticeEmail", {
+            method: "POST",
+            body: JSON.stringify({
+                phone: this.state.phone,
+                email: this.state.email,
+                name: this.state.name,
+                twitterHandle:this.state.username,
+                countPozAcc:this.state.countPozAcc,
+                countNegAcc:this.state.countNegAcc
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+        }
+        ).then(response => {
+            console.log(response)
+        })
+    }
+     addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+      }
 
     componentDidMount() {
         this.fetchUsers();
         this.timer = setInterval(() => this.fetchUsers(), 100000);
+        if(this.state.countNegAcc>0.66*this.state.countNegAcc+this.state.countPozAcc && this.state.mailTimeStamp.addDays(1).getTime()<new Date())
+        {
+            this.sendNoticeMail()
+            this.setState({mailTimeStamp:new Date()})
+        }
+
         //console.log(this.state.projId1)
     }
 
@@ -279,6 +313,7 @@ class Board extends React.Component {
         clearInterval(this.timer);
     }
     goToProfile() {
+        this.sendNoticeMail()
         this.props.history.push({
             pathname: '/profile',
             state: {

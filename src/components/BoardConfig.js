@@ -63,6 +63,26 @@ class BoardConfig extends React.Component {
         // console.log(this.state.personalizedRecommandations)
     };
 
+    // sendMonthlyEmail()
+    // {
+    //     fetch("http://127.0.0.1:5000/sendWelcomeEmail", {
+    //         method: "POST",
+    //         body: JSON.stringify({
+    //             phone: this.state.phone,
+    //             email: this.state.email,
+    //             name: this.state.name,
+    //             twitterHandle:this.state.username,
+                
+    //         }),
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Accept': 'application/json'
+    //         },
+    //     }
+    //     ).then(response => {
+    //         console.log(response)
+    //     })
+    // }
     sendWelcomeEmail()
     {
         fetch("http://127.0.0.1:5000/sendWelcomeEmail", {
@@ -113,7 +133,6 @@ class BoardConfig extends React.Component {
 
     }
     showTwoProjects(e) {
-        this.sendWelcomeEmail()
         e.preventDefault()
         this.showOneProject(e)
         var y = document.getElementById("hidden-project-norm2");
@@ -195,6 +214,7 @@ class BoardConfig extends React.Component {
             {
             this.sendWelcomeEmail()
             }
+            this.sendMonthlyEmail()
             return response.json()
         })
             .then(json => {
