@@ -18,7 +18,6 @@ import sys
 # import requests
 # from redis import Redis
 # from rq import Queue
-
 thread = None
 SatwiEmail=Connect.SatwiEmail
 SatwiPassword=Connect.SatwiPassword
@@ -138,6 +137,7 @@ def getUserInfo():
   cursor.execute( "select noprojects, ReceiveRecommendations, ReceiveEmails, ReceiveMonthlyReport, competitor, boardId,TwitterHandle from boards where ProvidedUserId like %s", [ProvidedUserId])
   conn.commit()
   data1=list(cursor.fetchall())
+  print("PRINTING DATA 1")
   print(data1)
   boardId=data1[0][5]
   noProjects=data1[0][0]
@@ -154,9 +154,9 @@ def getUserInfo():
     "name":data[0][3],
     "createdAt":data[0][4],
     "profilePic":data[0][5],
-    "ReceiveRecommendations":data1[0][0],
-    "ReceiveEmails":data1[0][1],
-    "ReceiveMonthlyReport":data1[0][2],
+    "ReceiveRecommendations":data1[0][1],
+    "ReceiveEmails":data1[0][2],
+    "ReceiveMonthlyReport":data1[0][3],
     "competitor":data1[0][4],
     "boardid":data1[0][5],
     "TwitterHandle":data1[0][6],
@@ -221,8 +221,9 @@ def board():
   i=0
   BoardId=random.getrandbits(28)
   timelineId=random.getrandbits(28)
-  valuesUserBoard=(timelineId,BoardId, ProvidedUserId, competitor, username, ReceiveRecommendations, ReceiveEmails, ReceiveMonthlyReport, len(features))
-  cursor1.execute( "INSERT INTO Boards (timelineId, BoardId, ProvidedUserId, Competitor, TwitterHandle, ReceiveRecommendations,ReceiveEmails,ReceiveMonthlyReport,  noprojects) VALUES  (%s,%s,%s,%s,%s,%s,%s,%s, %s)", valuesUserBoard)
+  updatedTimeline= datetime.now()
+  valuesUserBoard=(updatedTimeline,timelineId,BoardId, ProvidedUserId, competitor, username, ReceiveRecommendations, ReceiveEmails, ReceiveMonthlyReport, len(features))
+  cursor1.execute( "INSERT INTO Boards (updatedTimeline, timelineId, BoardId, ProvidedUserId, Competitor, TwitterHandle, ReceiveRecommendations,ReceiveEmails,ReceiveMonthlyReport, noprojects) VALUES  (%s,%s,%s,%s,%s,%s,%s,%s, %s, %s)", valuesUserBoard)
   conn1.commit()
   conn = mysql.connect
   cursor = conn.cursor()
@@ -333,6 +334,7 @@ def boardStats():
   trigger1=request.json['trigger1']
   projectName1=request.json['projectName1']
   competitor=request.json['competitor']
+  timelineId=request.json['timelineId']
   projectIds=[]
   if noProjects >= 1:
    projId1 = request.json['projId1']
@@ -522,10 +524,16 @@ def boardStats():
       if tweet[7]!='NaN':
         if tweet[7]!='NULL':
           if tweet[7]!="b''":
-            hashtagsListAccount.append(tweet[7])
+            if tweet[7]!='':
+              if tweet[7]!="['']":
+               if len(tweet[7])>=3:
+                 hashtagsListAccount.append(tweet[7])
     print(followerPerAccount)
     mostFollwedAccounts = sorted(followerPerAccount, key=followerPerAccount.get, reverse=True)[:5]
     mostNegativeTweets = sorted(negativeTweets, key=negativeTweets.get, reverse=True)[:5]
+    cursor.execute("select timestamp, countpositive, countnegative from timeline where timelineId like %s", [timelineId])
+    conn.commit()
+    dataTimeline=list(cursor.fetchall())
     result[twitterHandle]={
       'mostFollwedAccounts':mostFollwedAccounts,
       'followerPerAccount':followerPerAccount,
@@ -533,7 +541,8 @@ def boardStats():
       'negativeTweets':negativeTweets,
       'mostNegativeTweets':mostNegativeTweets,
       'countPozAcc':countPozAcc,
-      'countNegAcc':countNegAcc
+      'countNegAcc':countNegAcc,
+      'dataTimeline':dataTimeline
     }
   for i in range(len(projectIds)):
     results[projectIds[i]]={features[i]:result[features[i]],
@@ -752,5 +761,32 @@ def sendNoticeEmail():
   except Exception:
      print("Unexpected error:", sys.exc_info()[0])
      return 'error'
+   
+@app.route('/userNotifications', methods = ['POST'])
+@cross_origin()
+def changeUserNotifications():
+  conn = mysql.connect
+  cursor = conn.cursor()
+  value=request.json['type']
+  userid=request.json['userId']
+  cursor.execute("SELECT BoardId from Boards WHERE ProvidedUserId LIKE %s", [userid])
+  conn.commit()
+  data = list(cursor.fetchall())
+  print(data[0][0])
+  if value=="emails":
+    ReceiveEmails=request.json['ReceiveEmails']
+    values=(ReceiveEmails, data[0][0])
+    print(values)
+    cursor.execute("UPDATE boards SET ReceiveEmails = %s WHERE boardid = %s",values)
+    conn.commit()
+  if value=="notifications":
+    ReceiveNotifications=request.json['ReceiveNotifications']
+    values=(ReceiveNotifications, data[0][0])
+    print(values)
+    cursor.execute("UPDATE boards SET ReceiveRecommendations = %s WHERE boardid = %s",values)
+    conn.commit()
+  return jsonify({"body": ""}), 200
+  
+  
   
 

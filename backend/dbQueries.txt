@@ -140,3 +140,6 @@ CREATE TABLE Timeline (
     countPositive int(4),
     countNegative int(5)
 );
+
+ALTER TABLE boards
+Add updatedTimeline Date;

@@ -20,7 +20,7 @@ class App extends React.Component {
       pathname: '',
       userId: "",
       timelineId: 0,
-      email:'',
+      email: '',
       username: '',
       competitor: '',
       projectName1: '',
@@ -29,22 +29,24 @@ class App extends React.Component {
       trigger1: '',
       date1: '',
       projId1: '',
-      projectName2:  '',
-      feature2:  '',
-      trigger2:  '',
-      date2:  '',
+      projectName2: '',
+      feature2: '',
+      trigger2: '',
+      date2: '',
       projId2: '',
       projectName3: '',
-      feature3:  '',
+      feature3: '',
       trigger3: '',
-      date3:  '',
+      date3: '',
       projId3: '',
       noProjects: 0,
       userId: '',
-      timelineId: []
+      timelineId: [],
+      responseCode: 0
     }
     this.findOutMore = this.findOutMore.bind(this);
     this.explore = this.explore.bind(this);
+    this.setValues=this.setValues.bind(this);
     this.dropGuest = this.dropGuest.bind(this);
     this.dropEnterprise = this.dropEnterprise.bind(this);
     this.dropPro = this.dropPro.bind(this);
@@ -52,6 +54,47 @@ class App extends React.Component {
     this.userSearch = this.userSearch.bind(this);
     this.goPro = this.goPro.bind(this);
   }
+
+
+  setValues = json=>
+  {
+    if(this.state.responseCode!=400)
+    {
+   console.log(json)
+  //  console.log(json['body'])
+  //  console.log("TIMELINE ID")
+  //  console.log(json['body']['timelineId'])
+
+   this.props.history.push({
+     pathname: '/board',
+     state: {
+       isLogin: true,
+       email: json['body']['email'],
+       username: json['body']['twitterHandle'],
+       competitor: json['body']['competitor'],
+       projectName1: json['body']['projects'][0][0],
+       boardsId: json['body']['boardId'],
+       feature1: json['body']['projects'][0][1],
+       trigger1: json['body']['projects'][0][2],
+       date1: json['body']['projects'][0][2],
+       projId1: json['body']['projects'][0][4],
+       projectName2: json['body']['projects'][1] ? json['body']['projects'][1][0] : '',
+       feature2: json['body']['projects'][1] ? json['body']['projects'][1][1] : '',
+       trigger2: json['body']['projects'][1] ? json['body']['projects'][1][2] : '',
+       date2: json['body']['projects'][1] ? json['body']['projects'][1][3] : '',
+       projId2: json['body']['projects'][1] ? json['body']['projects'][1][4] : '',
+       projectName3: json['body']['projects'][2] ? json['body']['projects'][2][0] : '',
+       feature3: json['body']['projects'][2] ? json['body']['projects'][2][1] : '',
+       trigger3: json['body']['projects'][2] ? json['body']['projects'][2][2] : '',
+       date3: json['body']['projects'][2] ? json['body']['projects'][2][3] : '',
+       projId3: json['body']['projects'][2] ? json['body']['projects'][2][4] : '',
+       noProjects: json['body']['projects'][1] ? json['body']['projects'][2] ? 3 : 2 : 1,
+       userId: this.state.userId,
+       timelineId: json['body']['timelineId']
+     }
+   })
+  }
+ }
   responseGoogle = (response) => {
     console.log(response);
     console.log(response.profileObj);
@@ -75,46 +118,19 @@ class App extends React.Component {
       console.log(response)
       if (response.status == 200) {
         this.setState({ pathname: '/board' })
+        return response.json()
       }
-      return response.json()
-
-    }).then(json => {
-      console.log(json)
-      console.log(json['body'])
-      console.log("TIMELINE ID")
-      console.log(json['body']['timelineId'])
-    
-      this.props.history.push({
-        pathname: '/board',
-        state: {
-            isLogin:true,
-            email:json['body']['email'],
-            username: json['body']['twitterHandle'],
-            competitor:json['body']['competitor'],
-            projectName1:json['body']['projects'][0][0],
-            boardsId:json['body']['boardId'],
-            feature1:json['body']['projects'][0][1],
-            trigger1: json['body']['projects'][0][2],
-            date1:json['body']['projects'][0][2],
-            projId1:json['body']['projects'][0][4],
-            projectName2: json['body']['projects'][1] ? json['body']['projects'][1][0] : '' ,
-            feature2:json['body']['projects'][1] ? json['body']['projects'][1][1] : '',
-            trigger2: json['body']['projects'][1] ? json['body']['projects'][1][2]  : '',
-            date2:json['body']['projects'][1] ? json['body']['projects'][1][3] : '',
-            projId2:json['body']['projects'][1] ? json['body']['projects'][1][4]  :'',
-            projectName3: json['body']['projects'][2] ? json['body']['projects'][2][0] : '',
-            feature3: json['body']['projects'][2] ?json['body']['projects'][2][1]:'',
-            trigger3: json['body']['projects'][2]? json['body']['projects'][2][2]:'',
-            date3: json['body']['projects'][2]? json['body']['projects'][2][3]:'',
-            projId3:json['body']['projects'][2]? json['body']['projects'][2][4]:'',
-            noProjects: json['body']['projects'][1]?  json['body']['projects'][2] ? 3 : 2 : 1,
-            userId:this.state.userId,
-            timelineId:json['body']['timelineId']
+      else {
+        this.setState({responseCode: 400})
+        this.props.history.push({
+          pathname: '/error',
+          state: {
+            responseCode: 400,
+            issue: 100
           }
-      })
-    })
-
-   
+        })
+      }
+    }).then(json=>{this.setValues(json)})
   }
   userSearch() {
     this.props.history.push({ pathname: '/search' })

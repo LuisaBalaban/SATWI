@@ -5,6 +5,8 @@ import Modal from './Modal.js';
 import leftArrowSmall from '../images/left-arrow.png'
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 class UserProfile extends React.Component {
     constructor(props) {
@@ -30,8 +32,9 @@ class UserProfile extends React.Component {
             projId1: this.props.location.state.projId1,
             projId2: this.props.location.state.projId2,
             projId3: this.props.location.state.projId3,
+            timelineId:this.props.location.state.timelineId,
             profilePic: "",
-            ReceiveRecommendations: 0,
+            ReceiveNotifications: 0,
             ReceiveMonthlyReport: 0,
             ReceiveEmails: 0,
             projects: {},
@@ -61,7 +64,7 @@ class UserProfile extends React.Component {
         this.hideModal = this.hideModal.bind(this);
         this.goBack = this.goBack.bind(this)
         this.handleChangeMonthlyReport = this.handleChangeMonthlyReport.bind(this)
-        this.handleChangePersonalizedRecommandations = this.handleChangePersonalizedRecommandations.bind(this)
+        this.handleChangeNotifications = this.handleChangeNotifications.bind(this)
         this.handleChangeReceiveEmails = this.handleChangeReceiveEmails.bind(this)
     }
     fetchUsers() {
@@ -88,8 +91,8 @@ class UserProfile extends React.Component {
                     email: json.body["email"],
                     createdAt: json.body["createdAt"],
                     profilePic: json.body["profilePic"],
-                    ReceiveRecommendations: json.body["ReceiveRecommendations"],
-                    ReceiveEmails: json.body["ReceiveEmails"],
+                    ReceiveNotifications: json.body["ReceiveRecommendations"]==1? true : false,
+                    ReceiveEmails: json.body["ReceiveEmails"]==1? true : false,
                     ReceiveMonthlyReport: json.body["ReceiveMonthlyReport"],
                     competitor: json.body["competitor"],
                     boardsId: json.body["boardid"],
@@ -164,15 +167,51 @@ class UserProfile extends React.Component {
     }
     handleChangeMonthlyReport() {
         this.setState({ ReceiveMonthlyReport: !this.state.ReceiveMonthlyReport });
+        
     }
-    handleChangePersonalizedRecommandations() {
-        this.setState({ ReceiveRecommendations: !this.state.ReceiveRecommendations });
+    handleChangeNotifications() {
+       
+        fetch("http://127.0.0.1:5000/userNotifications", {
+            method: "POST",
+            body: JSON.stringify({
+                type:"notifications",
+                userId:this.state.userId,
+                ReceiveNotifications: !this.state.ReceiveNotifications
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+        }
+        ).then(response => {
+            console.log(response)
+        
+        })
+        this.setState({ ReceiveNotifications: !this.state.ReceiveNotifications });
     }
     handleChangeReceiveEmails() {
+       
+        fetch("http://127.0.0.1:5000/userNotifications", {
+            method: "POST",
+            body: JSON.stringify({
+                type:"emails",
+                userId:this.state.userId,
+                ReceiveEmails:!this.state.ReceiveEmails
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+        }
+        ).then(response => {
+            console.log(response)
+        
+        })
         this.setState({ ReceiveEmails: !this.state.ReceiveEmails });
     }
     exportProject = (e) => {
         console.log(e.target.value)
+        console.log(this.state.timelineId)
         const proj = e.target.value
         console.log("making db request")
         console.log(this.state.projId1)
@@ -186,6 +225,8 @@ class UserProfile extends React.Component {
                 trigger1: e.target.value > 1 ? e.target.value > 2 ? this.state.trigger3 : this.state.trigger2 : this.state.trigger1,
                 competitor: this.state.competitor,
                 projectName1: e.target.value > 1 ? e.target.value > 2 ? this.state.projectName3 : this.state.projectName2 : this.state.projectName1,
+                username:this.state.username,
+                timelineId:this.state.timelineId
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -211,7 +252,7 @@ class UserProfile extends React.Component {
                         projectId = this.state.projId3
                         projectTrigger = this.state.trigger3
                         projFeature = this.state.feature3
-                        projectName = this.state.projectNa3
+                        projectName = this.state.projectName3
                     }
                 }
                 else {
@@ -244,25 +285,34 @@ class UserProfile extends React.Component {
                     const tableRowsTrigger1 = [["Data collected since ", this.state.date1], ["Average polarity", this.state.avgPolarityTrigger1], ["Reached users", this.state.impactedFollowersTrigger1], ["Associated hastags", this.state.hashtagTrigger1]]
                     const date = Date().split(" ");
                     const dateStr = date[0] + date[1] + date[2] + date[3] + date[4];
-                    doc.text("General report", 14, 15);
-                    doc.text("Project 1. " + projectName, 20, 25);
+                    doc.text("Individual Project report", 14, 15);
+                    doc.setFontSize(15);
+                    doc.text("" + projectName, 20, 25);
                     doc.text("Feature " + projFeature, 20, 35);
                     doc.autoTable(tableColumnFeature1, tableRowsFeature1, { startY: 40 });
                     doc.setFont("helvetica");
                     doc.setFontSize(9);
                     doc.text("Most poplar users mentioning the feature:" + " ", 20, 100)
                     const tableColumnBubbleChart1 = ["Word", "Average polarity"]
-                    const tableRowsBubbleChart1 = []
-                    this.state.bubble_chart_data1.map(item => {
-                        if (item[1] > 0, 7 || item[1] < 0, 3)
-                            tableRowsBubbleChart1.push(item)
-                    })
-                    doc.text("Most notable words associated with the feature ", 20, 105);
-                    doc.autoTable(tableColumnBubbleChart1, tableRowsBubbleChart1, {
-                        startY: 110,
-                        tableWidth: 100
-                    })
+                    var bubble_chart_1=[]
+        bubble_chart_1=this.state.bubble_chart_data1.sort(function(a, b) {
+            return b[1] - a[1];
+          })
+        doc.text("Most notable words associated with the feature ", 20, 105);
+        var tableRows1=[]
+        var tableRows2=[]
+        tableRows1=bubble_chart_1.slice(0,5)
+        console.log(tableRows1)
+        tableRows2=bubble_chart_1.slice(-5)
+        tableRows1.concat(tableRows2)
+        console.log(bubble_chart_1)
+        doc.autoTable(tableColumnBubbleChart1, tableRows1, {
+            startY: 110,
+            tableWidth: 100
+        })
+        doc.setFontSize(15);
                     doc.text("Trigger: " + projectTrigger, 20, 210);
+                    doc.setFontSize(9);
                     doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
 
                     doc.save(`report_${dateStr}.pdf`);
@@ -286,7 +336,10 @@ class UserProfile extends React.Component {
         console.log(this.state.loadedData)
 
         console.log(this.state.noProjects)
-        return (
+        console.log("PRINTING NOTIF")
+        console.log(this.state.ReceiveEmails)
+        console.log(this.state.ReceiveNotifications) 
+               return (
             <div classname="body-board">
                 <h1 id="small-title">{this.state.username}'s account</h1>
 
@@ -332,12 +385,40 @@ class UserProfile extends React.Component {
                             </button></h3>
                         </div>
                         <h3>Notifications</h3>
-                        <div>
-                            <ul class="ks-cboxtags">
-                                <li><input type="checkbox" value="ReceiveEmails" checked={this.state.ReceiveEmails} onChange={this.handleChangeReceiveEmails} /><label for="checkboxTwo"></label><p>  Receive emails</p></li>
-                                <li><input type="checkbox" value="monthlyReport" checked={this.state.monthlyReport} onChange={this.ReceiveMonthlyReport} /><label for="checkboxThree"></label><p>  Autogenerated monthly report</p></li>
-                            </ul>
-                            <button class="buttonSpecial" onClick={this.goBack}><img id="left-arrow" src={leftArrowSmall} /></button>
+                        <div id="containerCheckBoxes">   
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={this.state.ReceiveEmails}
+                                    onChange={this.handleChangeReceiveEmails}
+                                    name="receiveEmails"
+                                    color="#af88d3"
+                                />
+                            }
+                            label={<span style={{ fontSize: '1.5rem' ,fontFamily: 'Reem Kufi'}}>Receive emails</span>}
+                        />
+                         {/* <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={this.state.ReceiveMonthlyReport}
+                                    onChange={this.handleChangeMonthlyReport}
+                                    name="ReceiveMonthlyReport"
+                                    color="#af88d3"
+                                />
+                            }
+                            label={<span style={{ fontSize: '1.5rem',fontFamily: 'Reem Kufi' }}>Receive monthly report</span>}
+                        /> */}
+                             <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={this.state.ReceiveNotifications}
+                                    onChange={this.handleChangeNotifications}
+                                    name="Receive recommendations"
+                                    color="#af88d3"
+                                />
+                            }
+                            label={<span style={{ fontSize: '1.5rem' , fontFamily: 'Reem Kufi'}}>Receive notifications</span>}
+                        />
                         </div>
                     </div>
 

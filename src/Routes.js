@@ -6,7 +6,7 @@ import UserInterface from './components/UserInterface';
 import BoardConfig from './components/BoardConfig'
 import Board from './components/Board'
 import UserProfile from './components/UserProfile';
-
+import Error from './components/Error'
 
 function Routes() {
   return (
@@ -20,7 +20,7 @@ function Routes() {
         <Route path="/search" component={UserInterface} />
         <Route path="/board" component={Board} />
         <Route path='/board-config' component={BoardConfig}/>
-        {/* <Route path='/board-stats' component={Board}/> */}
+        <Route path='/error' component={Error}/>
         <Route path='/profile' component={UserProfile}/>
      </Router>
      

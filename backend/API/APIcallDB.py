@@ -57,7 +57,8 @@ def extractTweetData(tweet_info, created_at,ids,tweetType,retweet_count_dict, fo
     retweet_count_dict[tweet]=tweet_info.retweet_count
     followers_count_list.append(tweet_info.user.followers_count)
     if tweet_info.entities.get('hashtags'):       
-        if tweet_info.entities['hashtags'][0]['text']:
+        if tweet_info.entities['hashtags'][0]['text']!='':
+            if tweet_info.entities['hashtags'][0]['text']!="['']":
                 hashtags_pairing_id[tweet_info.entities['hashtags'][0]['text']]=tweet_info.id
                 hashtags.append( tweet_info.entities['hashtags'][0]['text'])
         else:         

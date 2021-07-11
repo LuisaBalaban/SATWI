@@ -130,35 +130,35 @@ class Board extends React.Component {
         this.goToProfile = this.goToProfile.bind(this);
     }
 
-    pushTimeline(date, countNeg, countPoz) {
-        console.log("making db request for pusihn timeline")
+    // pushTimeline(date, countNeg, countPoz) {
+    //     console.log("making db request for pusihn timeline")
 
-        fetch("http://127.0.0.1:5000/addTimeline", {
-            method: "POST",
-            body: JSON.stringify({
-                date: date,
-                countNeg:countNeg,
-                countPoz:countPoz,
-                timelineId:this.state.timelineId
+    //     fetch("http://127.0.0.1:5000/addTimeline", {
+    //         method: "POST",
+    //         body: JSON.stringify({
+    //             date: date,
+    //             countNeg:countNeg,
+    //             countPoz:countPoz,
+    //             timelineId:this.state.timelineId
 
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-        }
-        ).then(response => {
-            console.log(response)
-            return response.json()
-        })
-            .then(json => {
-                console.log(json)
-                this.setState({
-                    timelineAccount:this.state.timelineAccount.concat(json['body'])
-                })
+    //         }),
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Accept': 'application/json'
+    //         },
+    //     }
+    //     ).then(response => {
+    //         console.log(response)
+    //         return response.json()
+    //     })
+    //         .then(json => {
+    //             console.log(json)
+    //             this.setState({
+    //                 timelineAccount:this.state.timelineAccount.concat(json['body'])
+    //             })
 
-            })
-    }
+    //         })
+    // }
     fetchUsers() {
 
         console.log("making db request")
@@ -181,7 +181,8 @@ class Board extends React.Component {
                 competitor: this.state.competitor,
                 projectName1: this.state.projectName1,
                 projectName2: this.state.projectName2,
-                projectName3: this.state.projectName3
+                projectName3: this.state.projectName3,
+                timelineId:this.state.timelineId
 
             }),
             headers: {
@@ -255,6 +256,7 @@ class Board extends React.Component {
                     countNegAcc: json.body[this.state.projId1][this.state.username].countNegAcc,
                     // timelineAccount:this.state.timelineAccount.concat(new Date(),  json.body[this.state.projId1][this.state.username].countPozAcc, json.body[this.state.projId1][this.state.username].countNegAcc),
                     // timelineId:json.body['timelineId']
+                    timelineAccount:json.body[this.state.projId1][this.state.username].dataTimeline
          
 
                 })
@@ -265,7 +267,8 @@ class Board extends React.Component {
                 console.log(this.state.timelineAccount)
                 console.log(json.body[this.state.projId1].timelineCountCompetitor)
                 console.log(this.state.timelineAccount)
-                this.pushTimeline(new Date(), json.body[this.state.projId1][this.state.username].countNegAcc, json.body[this.state.projId1][this.state.username].countPozAcc)
+                console.log(json.body[this.state.projId1][this.state.username].dataTimeline)
+                // this.pushTimeline(new Date(), json.body[this.state.projId1][this.state.username].countNegAcc, json.body[this.state.projId1][this.state.username].countPozAcc)
             })
     }
 
@@ -298,12 +301,12 @@ class Board extends React.Component {
 
     componentDidMount() {
         this.fetchUsers();
-        this.timer = setInterval(() => this.fetchUsers(), 100000);
-        if(this.state.countNegAcc>0.66*this.state.countNegAcc+this.state.countPozAcc && this.state.mailTimeStamp.addDays(1).getTime()<new Date())
-        {
-            this.sendNoticeMail()
-            this.setState({mailTimeStamp:new Date()})
-        }
+        this.timer = setInterval(() => this.fetchUsers(), 1000000);
+        // if(this.state.countNegAcc>0.66*this.state.countNegAcc+this.state.countPozAcc && this.state.mailTimeStamp.addDays(1).getTime()<new Date())
+        // {
+        //     this.sendNoticeMail()
+        //     this.setState({mailTimeStamp:new Date()})
+        // }
 
         //console.log(this.state.projId1)
     }
@@ -313,7 +316,7 @@ class Board extends React.Component {
         clearInterval(this.timer);
     }
     goToProfile() {
-        this.sendNoticeMail()
+        console.log(this.state.timelineId)
         this.props.history.push({
             pathname: '/profile',
             state: {
@@ -339,8 +342,8 @@ class Board extends React.Component {
                 trigger2: this.state.trigger2,
                 trigger3: this.state.trigger3,
                 competitor: this.state.competitor,
-                userId: this.state.userId,
-                TwitterHandle: this.state.username
+                TwitterHandle: this.state.username,
+                timelineId:this.state.timelineId
             }
         })
     }
@@ -364,20 +367,123 @@ class Board extends React.Component {
         doc.autoTable(tableColumnFeature1, tableRowsFeature1, { startY: 40 });
         doc.setFont("helvetica");
         doc.setFontSize(9);
-        doc.text("Most poplar users mentioning the feature:" + " ", 20, 100)
+        doc.text("Most popular users mentioning the feature:" + " ", 20, 100)
         const tableColumnBubbleChart1 = ["Word", "Average polarity"]
-        const tableRowsBubbleChart1 = []
-        this.state.bubble_chart_data1.map(item => {
-            if (item[1] > 0, 7 || item[1] < 0, 3)
-                tableRowsBubbleChart1.push(item)
-        })
+        var bubble_chart_1=[]
+        bubble_chart_1=this.state.bubble_chart_data1.sort(function(a, b) {
+            return b[1] - a[1];
+          })
         doc.text("Most notable words associated with the feature ", 20, 105);
-        doc.autoTable(tableColumnBubbleChart1, tableRowsBubbleChart1, {
+        var tableRows1=[]
+        var tableRows2=[]
+        tableRows1=bubble_chart_1.slice(0,5)
+        console.log(tableRows1)
+        tableRows2=bubble_chart_1.slice(-5)
+        tableRows1.concat(tableRows2)
+        console.log(bubble_chart_1)
+        doc.autoTable(tableColumnBubbleChart1, tableRows1, {
             startY: 110,
             tableWidth: 100
         })
-        doc.text("Trigger: " + this.state.trigger1, 20, 210);
-        doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
+        doc.text("Trigger: " + this.state.trigger1, 20, 200);
+        doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 235 });
+        
+        if (this.state.noProjects >= 2) {
+            let y = 350
+            if (y >= pageHeight) {
+                doc.addPage();
+                y = 30
+            }
+            console.log(pdfs)
+            console.log(pdfs.date2)
+
+            const tableColumnFeature1 = ["Info", "Value"];
+            const tableRowsFeature1 = [["Data collected since ", this.state.date2], ["Tweets of type: retweet", this.state.count_retweets2], ["Tweets of type: text", this.state.count_tweets2], ["Negative Tweets count", this.state.countNeg2], ["Positive tweets count", this.state.countPoz2]]
+            const tableColumnTrigger1 = ["Info", "Value"];
+            const tableRowsTrigger1 = [["Data collected since ", this.state.date2], ["Average polarity", this.state.avgPolarityTrigger2], ["Reached users", this.state.impactedFollowersTrigger2], ["Associated hastags", this.state.hashtagTrigger2]]
+            // ticket title. and margin-top + margin-left
+            doc.setFontSize(20);
+            doc.text("Project 2. " + this.state.projectName2, 20, 25);
+            doc.setFontSize(15);
+            doc.text("Feature " + this.state.feature2, 20, 35);
+            doc.setFontSize(9);
+            doc.autoTable(tableColumnFeature1, tableRowsFeature1, { startY: 40 });
+            doc.setFont("helvetica");
+            doc.setFontSize(9);
+            doc.text("Most poplar users mentioning the feature:" + " ", 20, 100)
+            const tableColumnBubbleChart1 = ["Word", "Average polarity"]
+            var bubble_chart_2=[]
+            bubble_chart_2=this.state.bubble_chart_data2.sort(function(a, b) {
+                return b[1] - a[1];
+              })
+            // this.state.bubble_chart_data3.map(item => {
+            //     if (item[1] > 0.7 || item[1] < 0.3)
+            //         tableRowsBubbleChart1.push(item)
+            // })
+            doc.text("Most notable words associated with the feature ", 20, 105);
+           
+            var tableRows1=[]
+            var tableRows2=[]
+  
+            tableRows1=bubble_chart_2.slice(0,5)
+            console.log(tableRows1)
+            tableRows2=bubble_chart_2.slice(-5)
+            tableRows1.concat(tableRows2)
+            console.log(bubble_chart_2)
+            doc.autoTable(tableColumnBubbleChart1, tableRows1, {
+                startY: 110,
+                tableWidth: 100
+            })
+            doc.text("Trigger: " + this.state.trigger2, 20, 200);
+            doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
+        }
+        if (this.state.noProjects === 3) {
+            let y = 350
+            if (y >= pageHeight) {
+                doc.addPage();
+                y = 30
+            }
+            console.log(pdfs)
+            console.log(pdfs.date3)
+
+
+            const tableColumnFeature1 = ["Info", "Value"];
+            const tableRowsFeature1 = [["Data collected since ", this.state.date3], ["Tweets of type: retweet", this.state.count_retweets3], ["Tweets of type: text", this.state.count_tweets3], ["Negative Tweets count", this.state.countNeg3], ["Positive tweets count", this.state.countPoz3]]
+            const tableColumnTrigger1 = ["Info", "Value"];
+            const tableRowsTrigger1 = [["Data collected since ", this.state.date3], ["Average polarity", this.state.avgPolarityTrigger3], ["Reached users", this.state.impactedFollowersTrigger3], ["Associated hastags", this.state.hashtagTrigger3]]
+            doc.setFontSize(20)
+            doc.text("Project 3. " + this.state.projectName3, 20, 25);
+            doc.setFontSize(15)
+            doc.text("Feature " + this.state.feature3, 20, 35);
+            doc.autoTable(tableColumnFeature1, tableRowsFeature1, { startY: 40 });
+            doc.setFont("helvetica");
+            doc.setFontSize(9);
+            doc.text("Most popular users mentioning the feature:" + " ", 20, 100)
+            const tableColumnBubbleChart1 = ["Word", "Average polarity"]
+            var bubble_chart_3=[]
+            bubble_chart_3=this.state.bubble_chart_data3.sort((function(a, b) {
+                return b[1] - a[1];
+              }))
+    
+            doc.text("Most notable words associated with the feature ", 20, 105);
+           
+            var tableRows1=[]
+            var tableRows2=[]
+  
+            tableRows1=bubble_chart_3.slice(0,5)
+            console.log(tableRows1)
+            tableRows2=bubble_chart_3.slice(-5)
+            tableRows1.concat(tableRows2)
+            console.log(bubble_chart_3)
+            doc.autoTable(tableColumnBubbleChart1, tableRows1, {
+                startY: 110,
+                tableWidth: 100
+            })
+            doc.text("Trigger: " + this.state.trigger3, 20, 200);
+            doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 225 });
+
+
+        }
         const tableRowsCompetitorPositive = []
         const tableColumnCompetitorPositive = ["Word", "No. of appereances"]
 
@@ -386,11 +492,13 @@ class Board extends React.Component {
             doc.addPage();
             y = 30
         }
+        doc.setFontSize(20)
         doc.text("Competitor: " + this.state.competitor, 20, y);
+        doc.setFontSize(9)
         if (this.state.word_sentiment_positive_competitor != []) {
             doc.text("Most frequent positive associated words with the competitor: " + this.state.competitor, 20, y + 10);
             this.state.word_sentiment_positive_competitor.map(item => {
-                if (item[1] > 5)
+                if (item[1] > 3)
                     tableRowsCompetitorPositive.push(item)
             })
             doc.autoTable(tableColumnCompetitorPositive, tableRowsCompetitorPositive, {
@@ -408,95 +516,58 @@ class Board extends React.Component {
                 if (item[1] > 3)
                     tableRowsCompetitorNegative.push(item)
             })
-            doc.text("Most frequent negative associated words with the competitor: " + this.state.competitor, 20, y + 110);
+            doc.text("Most frequent negative associated words with the competitor: " + this.state.competitor, 20, y + 70);
             doc.autoTable(tableColumnCompetitorPositive, tableRowsCompetitorNegative, {
-                startY: y + 120,
+                startY: y + 85,
                 tableWidth: 50
             });
         }
         else {
             doc.text("Not enough data. ", 20, y + 110);
         }
-        doc.text("Sentiment partition of competitor tweets", 20, y + 150);
+        doc.text("Sentiment partition of competitor tweets", 20, y + 200);
         const tableColumnCompetitorPoz = ["Info", "Value"];
         const tableRowsCompetitorPoz = [["Count positive", this.state.countPozCompetitor], ["Count negative", this.state.countNegCompetitor]]
         doc.autoTable(tableColumnCompetitorPoz, tableRowsCompetitorPoz, {
-            startY: y + 160,
+            startY: y + 205,
             tableWidth: 50
         });
+        //twitter account
 
-        if (this.state.noProjects >= 2) {
-            let y = 350
-            if (y >= pageHeight) {
-                doc.addPage();
-                y = 30
-            }
-            console.log(pdfs)
-            console.log(pdfs.date2)
-
-            const tableColumnFeature1 = ["Info", "Value"];
-            const tableRowsFeature1 = [["Data collected since ", this.state.date2], ["Tweets of type: retweet", this.state.count_retweets2], ["Tweets of type: text", this.state.count_tweets2], ["Negative Tweets count", this.state.countNeg2], ["Positive tweets count", this.state.countPoz2]]
-            const tableColumnTrigger1 = ["Info", "Value"];
-            const tableRowsTrigger1 = [["Data collected since ", this.state.date2], ["Average polarity", this.state.avgPolarityTrigger2], ["Reached users", this.state.impactedFollowersTrigger2], ["Associated hastags", this.state.hashtagTrigger2]]
-            // ticket title. and margin-top + margin-left
-            doc.text("General report", 14, 15);
-            doc.text("Project 1. " + this.state.projectName2, 20, 25);
-            doc.text("Feature " + this.state.feature2, 20, 35);
-            doc.autoTable(tableColumnFeature1, tableRowsFeature1, { startY: 40 });
-            doc.setFont("helvetica");
-            doc.setFontSize(9);
-            doc.text("Most poplar users mentioning the feature:" + " ", 20, 100)
-            const tableColumnBubbleChart1 = ["Word", "Average polarity"]
-            const tableRowsBubbleChart1 = []
-            this.state.bubble_chart_data2.map(item => {
-                if (item[1] > 0, 7 || item[1] < 0, 3)
-                    tableRowsBubbleChart1.push(item)
-            })
-            doc.text("Most notable words associated with the feature ", 20, 105);
-            doc.autoTable(tableColumnBubbleChart1, tableRowsBubbleChart1, {
-                startY: 110,
-                tableWidth: 100
-            })
-            doc.text("Trigger: " + this.state.trigger2, 20, 210);
-            doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
-        }
-        if (this.state.noProjects === 3) {
-            let y = 350
-            if (y >= pageHeight) {
-                doc.addPage();
-                y = 30
-            }
-            console.log(pdfs)
-            console.log(pdfs.date3)
-
-
-            const tableColumnFeature1 = ["Info", "Value"];
-            const tableRowsFeature1 = [["Data collected since ", this.state.date3], ["Tweets of type: retweet", this.state.count_retweets3], ["Tweets of type: text", this.state.count_tweets3], ["Negative Tweets count", this.state.countNeg3], ["Positive tweets count", this.state.countPoz3]]
-            const tableColumnTrigger1 = ["Info", "Value"];
-            const tableRowsTrigger1 = [["Data collected since ", this.state.date3], ["Average polarity", this.state.avgPolarityTrigger3], ["Reached users", this.state.impactedFollowersTrigger3], ["Associated hastags", this.state.hashtagTrigger3]]
-            doc.text("General report", 14, 15);
-            doc.text("Project 1. " + this.state.projectName3, 20, 25);
-            doc.text("Feature " + this.state.feature3, 20, 35);
-            doc.autoTable(tableColumnFeature1, tableRowsFeature1, { startY: 40 });
-            doc.setFont("helvetica");
-            doc.setFontSize(9);
-            doc.text("Most poplar users mentioning the feature:" + " ", 20, 100)
-            const tableColumnBubbleChart1 = ["Word", "Average polarity"]
-            const tableRowsBubbleChart1 = []
-            this.state.bubble_chart_data3.map(item => {
-                if (item[1] > 0, 7 || item[1] < 0, 3)
-                    tableRowsBubbleChart1.push(item)
-            })
-            doc.text("Most notable words associated with the feature ", 20, 105);
-            doc.autoTable(tableColumnBubbleChart1, tableRowsBubbleChart1, {
-                startY: 110,
-                tableWidth: 100
-            })
-            doc.text("Trigger: " + this.state.trigger3, 20, 210);
-            doc.autoTable(tableColumnTrigger1, tableRowsTrigger1, { startY: 215 });
-
-
-        }
+        y = 350
+        if (y >= pageHeight) {
+            doc.addPage();
+            y = 30}
+        doc.setFontSize(20)
+        doc.text("Twitter account analysis " + this.state.username, 14,y+10);
+        doc.setFontSize(9)
+        doc.text("Popular hashtags: " +this.state.hashtagsListAccount.map(hashtag => {if(hashtag!=" ")
+        {
+            return hashtag}
+            
+        }), 20, y+15);
+        doc.text("Popular users: " +  this.state.mostFollwedAccounts, 20, y+20);
+        doc.text("Sentiment partition of competitor tweets", 20, y + 30);
+        const tableColumnAccountPoz = ["Info", "Value"];
+        const tableRowsAccountPoz = [["Count positive", this.state.countPozAcc], ["Count negative", this.state.countNegAcc]]
+        doc.autoTable(tableColumnAccountPoz, tableRowsAccountPoz, {
+            startY: y + 35,
+            tableWidth: 50
+        });
+       let lastWeekTimeline
+        = this.state.timelineAccount.filter(function(value, index, Arr) {
+            return index % 24 == 0;
+        });
+        lastWeekTimeline
+        .slice(Math.max(lastWeekTimeline.length - 7, 0))
+        console.log(lastWeekTimeline)
+        const tableColumnAccountTimeline = ["Date", "Pozitive", "Negative"];
+        const tableRowsAccountTimeline = [...lastWeekTimeline]
+        doc.text("Timeline of positive and negative tweets count associated with the brand's Twitter account", 20, y + 70);
+        doc.autoTable(tableColumnAccountTimeline, tableRowsAccountTimeline, {
+            startY: y + 75,
+            tableWidth: 100
+        });
         doc.save(`report_${dateStr}.pdf`);
     };
 
@@ -773,7 +844,7 @@ class Board extends React.Component {
                             date3={this.state.date3}
                             timeline3={this.state.timeline3}
                             mostRetweetedTrigger3={this.state.mostRetweetedTrigger3} /> : ''}</div>
-                        <div><Account countNegAcc={this.state.countNegAcc} countPozAcc={this.state.countPozAcc}
+                        <div><Account id="timeline-account" countNegAcc={this.state.countNegAcc} countPozAcc={this.state.countPozAcc}
                             timelineAccount={this.state.timelineAccount}
                             mostFollwedAccounts={this.state.mostFollwedAccounts}
                             hashtagsListAccount={this.state.hashtagsListAccount}

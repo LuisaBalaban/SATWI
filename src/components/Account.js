@@ -17,7 +17,8 @@ class Account extends React.Component {
             countPozAcc: this.props.location.state.countPozAcc,
             countNegAcc: this.props.location.state.countNegAcc,
             mostNegativeTweets: this.props.location.state.mostNegativeTweets,
-            timelineAccount: this.props.location.state.timelineAccount
+            timelineAccount: this.props.location.state.timelineAccount,
+            userId:this.props.location.state.userId
 
         }
     }
@@ -30,7 +31,8 @@ class Account extends React.Component {
             countNegAcc: nextProps.countNegAcc,
             mostNegativeTweets: nextProps.mostNegativeTweets,
             username: nextProps.username,
-            timelineAccount: nextProps.timelineAccount
+            timelineAccount: nextProps.timelineAccount,
+            userId:nextProps.userId
         })
     }
 
@@ -44,9 +46,9 @@ class Account extends React.Component {
                         <div className="hidden-proj_board1">
                         <div className="vertical" id="board-vertical">
                             <p>Popular hashtags: </p>
-                            {this.state.hashtagsListAccount ? <div className="inline-elems">{this.state.hashtagsListAccount.map(hashtag => <TwitterHashtagButton
+                            {this.state.hashtagsListAccount ? <div className="inline-elems">{this.state.hashtagsListAccount.map(hashtag =>  hashtag!="['']" ? hashtag!="" ?<TwitterHashtagButton
                                 tag={hashtag}
-                            />)}</div> : ''}</div>
+                            /> : '':'')}</div> : ''}</div>
                             <div className="vertical" id="board-vertical">
                             <p>Most popular users mentioning @{this.state.username}</p>
                             {this.state.mostFollwedAccounts ? <div>{this.state.mostFollwedAccounts.map(id => <TwitterMentionButton
@@ -89,7 +91,7 @@ class Account extends React.Component {
                                     rootProps={{ 'data-testid': '3' }}
                                 />
                                 : ''}
-                            {this.state.timelineAccount ? <Chart
+                            {this.state.timelineAccount ? <Chart id="timeline-account"
                                 width={'480px'}
                                 height={'350px'}
                                 chartType="LineChart"

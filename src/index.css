@@ -279,7 +279,7 @@ section{
 }
 .container
 {
-  margin-top: 40px;
+  margin-top: 130px;
 }
 .login-back
 {
@@ -321,15 +321,16 @@ form
 input[type="text"],input[type="date"]
 {
     width: 100%;
-    height: 96px;
-    font-size: 60px;
+    height: 70px;
+    font-size: 30px;
     line-height: 1;
 }
 
 input[type="text"]::placeholder
 {
     color: #35323f5d;
-    font-size: 45px;
+    font-size: 30px;
+    margin-left: 20px;
 }
 
 #s-cover
@@ -755,7 +756,7 @@ input {
   flex-flow: column;
   box-shadow: 0px 15px 50px 10px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
-  height: 560px;
+  height: 360px;
   width: 360px;
   background: #dddbf3
   ;
@@ -812,7 +813,7 @@ input {
 .input-board
 {
   width: 500px;
-  height: 70px;
+  height: 50px;
   background: #EFEFF4;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 14px;
@@ -1076,7 +1077,7 @@ margin-bottom: 50px;
 #display-project p, h3
 {
   font-family: Reem Kufi;
-  font-size: 25px;
+  font-size: 20px;
 }
 
 #container-projects
@@ -1278,4 +1279,15 @@ font-family: Reem Kufi;
 #containerCheckBoxes{
   font-size: -webkit-xxx-large;
   font-family: Reem kufi;
+}
+.error-text
+{
+  text-align: center;
+  margin-top:300px;
+}
+
+#button-center
+{
+  margin-left: -20px;
+  margin-top: 20px;
 }

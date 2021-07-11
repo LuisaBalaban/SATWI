@@ -1,6 +1,7 @@
 import React from 'react';
 import '../index.css';
 import '../modal.css'
+import Loader from 'react-loader-spinner';
 
 class Form extends React.Component {
     constructor(props) {
@@ -12,9 +13,10 @@ class Form extends React.Component {
             userId: "",
             projId: '',
             TwitterHandle: '',
-            projectNo:0,
-            competitor:'',
-            boardId:''
+            projectNo: 0,
+            competitor: '',
+            boardId: '',
+            flag: 0
         }
         this.hideModal = this.hideModal.bind(this);
         this.handleChange = this.handleChange.bind(this)
@@ -32,9 +34,10 @@ class Form extends React.Component {
             projId: nextProps.projId,
             userId: nextProps.userId,
             TwitterHandle: nextProps.TwitterHandle,
-            projectNo:nextProps.projectNo,
-            competitor:nextProps.competitor,
-            boardId:nextProps.boardId
+            projectNo: nextProps.projectNo,
+            competitor: nextProps.competitor,
+            boardId: nextProps.boardId,
+
 
 
         })
@@ -44,6 +47,7 @@ class Form extends React.Component {
         this.setState({ show: false });
     };
     commitChanges = () => {
+        this.setState({ flag: 1 })
         console.log("MODIFYING PROJECT")
         console.log(this.state.trigger1)
         fetch("http://127.0.0.1:5000/modifyProject", {
@@ -68,10 +72,12 @@ class Form extends React.Component {
         })
             .then(json => {
                 console.log(json)
+                this.setState({ flag: 0 })
             })
     }
 
     commitChangesCompetitor = () => {
+        this.setState({ flag: 1 })
         console.log("MODIFYING COMPETITOR")
         console.log(this.state.competitor)
         fetch("http://127.0.0.1:5000/modifyCompetitor", {
@@ -80,7 +86,7 @@ class Form extends React.Component {
                 userId: this.state.userId,
                 competitor: this.state.competitor,
                 boardId: this.state.boardId,
-                projId:this.state.projId
+                projId: this.state.projId
             })
             ,
             headers: {
@@ -93,6 +99,7 @@ class Form extends React.Component {
             return response.json()
         })
             .then(json => {
+                this.setState({ flag: 0 })
                 console.log(json)
             })
     }
@@ -102,20 +109,39 @@ class Form extends React.Component {
         return (<div>
             <div className="center-modal">
                 {
-                    this.state.projectNo<5?
-                <div>
-                <h3>Edit your project features</h3>
-                <input type='text' name="projectName" defaultValue={this.state.projectName} onChange={this.handleChange} placeholder='Project Name' className="input-board" />
-                <input type='text' name="feature" defaultValue={this.state.feature} onChange={this.handleChange} placeholder='Associated feature' className="input-board" />
-                <input type='text' name="trigger1" defaultValue={this.state.trigger} onChange={this.handleChange} placeholder='Associated trigger' className="input-board" />
-                <button onClick={this.commitChanges}>Commit changes</button>
-                </div> : 
-                <div>
-                <h3>Edit your monitored competitor</h3>
-                <input type='text' name="competitor" defaultValue={this.state.competitor} onChange={this.handleChange} placeholder='Competitor' className="input-board" />
-                <button onClick={this.commitChangesCompetitor}>Commit changes</button>
-                </div>
-    }
+                    this.state.projectNo < 5 ?
+                        <div>
+                            <h3>Edit your project features</h3>
+                            <input type='text' name="projectName" defaultValue={this.state.projectName} onChange={this.handleChange} placeholder='Project Name' className="input-board" />
+                            <input type='text' name="feature" defaultValue={this.state.feature} onChange={this.handleChange} placeholder='Associated feature' className="input-board" />
+                            <input type='text' name="trigger1" defaultValue={this.state.trigger} onChange={this.handleChange} placeholder='Associated trigger' className="input-board" />
+                            <div style={{
+                                    width: "100%",
+                                    height: "100",
+                                    display: "flex", justifyContent: "center", alignItems: "center"
+                                    
+                                }}    >{this.state.flag == 1? <Loader type="TailSpin" color="#483e4f" height="50" width="100" /> : ''}
+                                </div>
+                            <div id="button-center" style={{  display: "flex", justifyContent: "center", alignItems: "center"}}>
+                            <button onClick={this.commitChanges}>Commit changes</button>
+                            </div>
+                        </div> :
+                        <div>
+                            <h3>Edit your monitored competitor</h3>
+                            <input type='text' name="competitor" defaultValue={this.state.competitor} onChange={this.handleChange} placeholder='Competitor' className="input-board" />
+                            <div style={{
+                                    width: "100%",
+                                    height: "100",
+                                    display: "flex", justifyContent: "center", alignItems: "center"
+                                    
+                                }}    >{this.state.flag == 1? <Loader type="TailSpin" color="#483e4f" height="50" width="100" /> : ''}
+                                </div>
+                            <div id="button-center" style={{  display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                <button  onClick={this.commitChangesCompetitor}>Commit changes</button>
+                               
+                            </div>
+                        </div>
+                }
             </div>
         </div>)
     }

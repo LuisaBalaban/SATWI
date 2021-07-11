@@ -36,8 +36,7 @@ class Login extends React.Component {
     }
 
     ).then(res => {
-      console.log(res)
-      console.log(this.state.noPhone)
+    
       if (res.status == 200) {
         this.props.history.push({
           pathname: '/board-config',
@@ -47,6 +46,16 @@ class Login extends React.Component {
             email: response.profileObj['email'],
             profilePic: response.profileObj['imageUrl'],
             phone: this.state.noPhone
+          }
+        })
+      }
+      else
+      {
+        this.props.history.push({
+          pathname: '/error',
+          state: {
+            responseCode: 400,
+            issue: 200
           }
         })
       }

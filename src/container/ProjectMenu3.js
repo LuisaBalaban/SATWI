@@ -64,7 +64,7 @@ class ProjectMenu3 extends React.Component {
 
                 <div className="box">
 
-                    <div className="vertical">
+                    <div className="vertical" id="board-vertical-inside">
 
                         <h1>{this.state.projectName3}</h1>
                         <hr class="rounded"></hr>
@@ -72,7 +72,7 @@ class ProjectMenu3 extends React.Component {
                         <div className="hidden-proj_board1">
 
                             <TweetEmbed options={{ width: 250 }} id={this.state.max_followers3} />
-                            <div className="vertical">
+                            <div className="vertical" id="board-vertical-inside">
                                 <div className="inline-charts">
                                     <Chart
                                         width={'150px'}
@@ -210,8 +210,8 @@ class ProjectMenu3 extends React.Component {
 
                                 <div className="inner-bottom">
                                     <div className="inline-charts">
-                                        <div className="vertical">
-                                            <div className="inline-charts">
+                                        <div className="vertical" id="board-vertical-inside">
+                                            <div className="inline-charts" id="inline-charts-trigger">
                                                 <h3 id="trigger-text">Trigger: {this.state.trigger3}</h3>
                                                 <Chart
                                                     width={'500px'}
@@ -259,7 +259,9 @@ class ProjectMenu3 extends React.Component {
                                             </div>
 
                                         </div>
+                                        <div className="tweet-container">
                                         <TweetEmbed options={{ width: 250 }} id={this.state.mostRetweetedTrigger3} />
+                                    </div>
                                     </div>
                                 </div>
                             </div>
