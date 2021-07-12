@@ -73,8 +73,8 @@ class ProjectMenu3 extends React.Component {
 
                             <TweetEmbed options={{ width: 250 }} id={this.state.max_followers3} />
                             <div className="vertical" id="board-vertical-inside">
-                                <div className="inline-charts">
-                                    <Chart
+                           <div className="inline-charts">
+                           {this.state.count_tweets3?<Chart
                                         width={'150px'}
                                         height={'200px'}
                                         chartType="PieChart"
@@ -102,9 +102,9 @@ class ProjectMenu3 extends React.Component {
                                             }
                                         }}
                                         rootProps={{ 'data-testid': '3' }}
-                                    />
+                                    /> : ""}
 
-                                    <Chart
+                                   {this.state.countPoz3? <Chart
                                         width={'150px'}
                                         height={'200px'}
                                         chartType="PieChart"
@@ -131,8 +131,8 @@ class ProjectMenu3 extends React.Component {
                                             }
                                         }}
                                         rootProps={{ 'data-testid': '1' }}
-                                    />
-                                    <Chart
+                                    /> : ""}
+                                    {this.state.polarityValues3 ? <Chart
                                         width={'300px'}
                                         height={'250px'}
                                         chartType="Histogram"
@@ -164,10 +164,10 @@ class ProjectMenu3 extends React.Component {
                                             }
                                         }}
                                         rootProps={{ 'data-testid': '1' }}
-                                    />
+                                    /> : ""}
 
 
-                                    <Chart
+                                   {this.state.bubble_chart_data3 ? <Chart
                                         width={'350px'}
                                         height={'250px'}
                                         chartType="BubbleChart"
@@ -205,7 +205,7 @@ class ProjectMenu3 extends React.Component {
                                             colorAxis: { colors: ['#9888b5', 'purple'] }
 
                                         }}
-                                        rootProps={{ 'data-testid': '1' }} />
+                                        rootProps={{ 'data-testid': '1' }} /> : ""}
                                 </div>
 
                                 <div className="inner-bottom">
@@ -213,7 +213,7 @@ class ProjectMenu3 extends React.Component {
                                         <div className="vertical" id="board-vertical-inside">
                                             <div className="inline-charts" id="inline-charts-trigger">
                                                 <h3 id="trigger-text">Trigger: {this.state.trigger3}</h3>
-                                                <Chart
+                                                {this.state.timeline3 ? <Chart
                                                     width={'500px'}
                                                     height={'350px'}
                                                     chartType="LineChart"
@@ -237,7 +237,7 @@ class ProjectMenu3 extends React.Component {
                                                         }
                                                     }}
                                                     rootProps={{ 'data-testid': '1' }}
-                                                />
+                                                /> : ""}
                                             </div>
 
                                             <div className="inline-charts">
@@ -252,7 +252,7 @@ class ProjectMenu3 extends React.Component {
                                                 </div>
                                                 <div className="vertical">
                                                     <p id="info">Associated hashtags:</p>
-                                                    <h4>{this.state.hashtagTrigger3}</h4>
+                                                    <h4>{this.state.hashtagTrigger3 ? this.state.hashtagTrigger3: "No associated hashtags"}</h4>
 
                                                 </div>
 

@@ -18,7 +18,7 @@ class Account extends React.Component {
             countNegAcc: this.props.location.state.countNegAcc,
             mostNegativeTweets: this.props.location.state.mostNegativeTweets,
             timelineAccount: this.props.location.state.timelineAccount,
-            userId:this.props.location.state.userId
+            userId: this.props.location.state.userId
 
         }
     }
@@ -32,7 +32,7 @@ class Account extends React.Component {
             mostNegativeTweets: nextProps.mostNegativeTweets,
             username: nextProps.username,
             timelineAccount: nextProps.timelineAccount,
-            userId:nextProps.userId
+            userId: nextProps.userId
         })
     }
 
@@ -44,19 +44,19 @@ class Account extends React.Component {
                     <div className="vertical" id="vertical-profile">
                         <h1>{this.state.username}'s Twitter account stats</h1>
                         <div className="hidden-proj_board1">
-                        <div className="vertical" id="board-vertical">
-                            <p>Popular hashtags: </p>
-                            {this.state.hashtagsListAccount ? <div className="inline-elems">{this.state.hashtagsListAccount.map(hashtag =>  hashtag!="['']" ? hashtag!="" ?<TwitterHashtagButton
-                                tag={hashtag}
-                            /> : '':'')}</div> : ''}</div>
                             <div className="vertical" id="board-vertical">
-                            <p>Most popular users mentioning @{this.state.username}</p>
-                            {this.state.mostFollwedAccounts ? <div>{this.state.mostFollwedAccounts.map(id => <TwitterMentionButton
-                                screenName={id}
-                            />)}</div> : ''}</div> <div className="vertical" id="tweets-group">
-                            <p>Most negative tweets</p>
-                            <div className="inline-charts">
-                            {this.state.mostNegativeTweets ? this.state.mostNegativeTweets.slice(0, 2).map(s => <TweetEmbed options={{ cards: 'hidden' }} id={s} />) : ''}</div></div>
+                                <p>Popular hashtags: </p>
+                                {this.state.hashtagsListAccount ? <div className="inline-elems">{this.state.hashtagsListAccount.map(hashtag => hashtag != "['']" ? hashtag != "" ? <TwitterHashtagButton
+                                    tag={hashtag}
+                                /> : '' : '')}</div> : ''}</div>
+                            <div className="vertical" id="board-vertical">
+                                <p>Most popular users mentioning @{this.state.username}</p>
+                                {this.state.mostFollwedAccounts ? <div>{this.state.mostFollwedAccounts.map(id => <TwitterMentionButton
+                                    screenName={id}
+                                />)}</div> : ''}</div> <div className="vertical" id="tweets-group">
+                                <p>Most negative tweets</p>
+                                <div className="inline-charts">
+                                    {this.state.mostNegativeTweets ? this.state.mostNegativeTweets.slice(0, 2).map(s => <TweetEmbed options={{ cards: 'hidden' }} id={s} />) : ''}</div></div>
                         </div>
                         <div className="hidden-proj_board1">
 
@@ -90,8 +90,8 @@ class Account extends React.Component {
                                     }}
                                     rootProps={{ 'data-testid': '3' }}
                                 />
-                                : ''}
-                            {this.state.timelineAccount ? <Chart id="timeline-account"
+                            : ''}
+                            {this.state.timelineAccount? this.state.timelineAccount.length > 0 ? <Chart id="timeline-account"
                                 width={'480px'}
                                 height={'350px'}
                                 chartType="LineChart"
@@ -115,7 +115,7 @@ class Account extends React.Component {
                                     }
                                 }}
                                 rootProps={{ 'data-testid': '1' }}
-                            /> :"Not enough data"}
+                            /> : "Not enough data" : ""}
                             {this.state.mostNegativeTweets ? this.state.mostNegativeTweets.slice(2, 4).map(s => <TweetEmbed options={{ cards: 'hidden' }} id={s} />) : ''}
                         </div>
                     </div>

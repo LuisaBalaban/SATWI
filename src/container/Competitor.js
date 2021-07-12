@@ -66,7 +66,7 @@ class Competitor extends React.Component {
                                     // For tests
                                     rootProps={{ 'data-testid': '1' }}
                                 /> : "Not enough data"}
-                                <Chart
+                                {this.state.word_sentiment_positive_competitor ? <Chart
                                     width={'500px'}
                                     height={'200px'}
                                     chartType="BarChart"
@@ -91,11 +91,11 @@ class Competitor extends React.Component {
                                     }}
 
                                     rootProps={{ 'data-testid': '1' }}
-                                />
+                                /> : ""}
                                 
                                 </div><div className="vertical">
                                 <div className="inline-charts"> 
-                                <Chart
+                                {this.state.countPozCompetitor ? <Chart
                                     width={'250px'}
                                     height={'200px'}
                                     chartType="PieChart"
@@ -120,8 +120,8 @@ class Competitor extends React.Component {
                                         }
                                     }}
                                     rootProps={{ 'data-testid': '1' }}
-                                />
-                                <Chart
+                                /> : ""}
+                               {this.state.timelineCompetitor ? <Chart
                                     width={'600px'}
                                     height={'200px'}
                                     chartType="LineChart"
@@ -145,7 +145,7 @@ class Competitor extends React.Component {
                                         }
                                     }}
                                     rootProps={{ 'data-testid': '1' }}
-                                />
+                                /> : ""}
                                 
                            </div>
                             </div>

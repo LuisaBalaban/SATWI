@@ -603,7 +603,7 @@ class Board extends React.Component {
                                     <TweetEmbed options={{ width: 250 }} id={this.state.max_followers1} />
                                     <div className="vertical" id="board-vertical-inside">
                                         <div className="inline-charts">
-                                            <Chart
+                                            {this.state.count_tweets1 ? <Chart
                                                 width={'150px'}
                                                 height={'200px'}
                                                 chartType="PieChart"
@@ -631,9 +631,9 @@ class Board extends React.Component {
                                                     }
                                                 }}
                                                 rootProps={{ 'data-testid': '3' }}
-                                            />
+                                            /> :''}
 
-                                            <Chart
+                                            {this.state.countPoz1 ? <Chart
                                                 width={'150px'}
                                                 height={'200px'}
                                                 chartType="PieChart"
@@ -660,8 +660,8 @@ class Board extends React.Component {
                                                     }
                                                 }}
                                                 rootProps={{ 'data-testid': '1' }}
-                                            />
-                                            <Chart
+                                            /> :" "}
+                                            {this.state.polarityValues1 ? <Chart
                                                 width={'300px'}
                                                 height={'250px'}
                                                 chartType="Histogram"
@@ -693,7 +693,7 @@ class Board extends React.Component {
                                                     }
                                                 }}
                                                 rootProps={{ 'data-testid': '1' }}
-                                            />
+                                            /> : ''}
 
 
                                             {this.state.bubble_chart_data1[0] ? <Chart
@@ -743,7 +743,7 @@ class Board extends React.Component {
                                                 <div className="vertical" id="board-vertical-inside">
                                                     <div className="inline-charts" id="inline-charts-trigger">
                                                         <h3 id="trigger-text">Trigger: {this.state.trigger1}</h3>
-                                                        <Chart
+                                                       {this.state.timeline1 ? <Chart
                                                             width={'500px'}
                                                             height={'350px'}
                                                             chartType="LineChart"
@@ -767,7 +767,7 @@ class Board extends React.Component {
                                                                 }
                                                             }}
                                                             rootProps={{ 'data-testid': '1' }}
-                                                        />
+                                                        /> : ""}
                                                     </div>
 
                                                     <div className="inline-charts">
@@ -778,7 +778,7 @@ class Board extends React.Component {
 
                                                         <div className="vertical">
                                                             <p id="info">Reached users:</p>
-                                                            <h4>{this.state.impactedFollowersTrigger1}</h4>
+                                                            <h4>{this.state.impactedFollowersTrigger1 ? this.state.impactedFollowersTrigger1 : 'Not enough data' }</h4>
                                                         </div>
                                                         <div className="vertical">
                                                             <p id="info">Associated hashtags:</p>
